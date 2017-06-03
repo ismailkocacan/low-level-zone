@@ -12,3 +12,8 @@ Contains Delphi and C++ simple example.
 - https://github.com/Microsoft/referencesource/tree/master/System.Core/System/IO/MemoryMappedFiles
 - https://github.com/Microsoft/referencesource/blob/master/System.Core/Microsoft/Win32/UnsafeNativeMethods.cs#L1432
 - https://github.com/Microsoft/referencesource/blob/master/System.Core/System/IO/MemoryMappedFiles/MemoryMappedFile.cs#L395
+
+
+- https://www.javacodegeeks.com/2013/05/power-of-java-memorymapped-file.html
+![ScreenShot](/dbg_img/dbg_1.png)
+![ScreenShot](/dbg_img/dbg_2.png)

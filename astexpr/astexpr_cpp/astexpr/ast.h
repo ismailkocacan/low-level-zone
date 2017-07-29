@@ -35,4 +35,4 @@ typedef ASTNode* PASTNode;
 
 
 bool IsNodeTypeEqual(PASTNode node, ASTNodeType nodeType);
-float Evualate(PASTNode node);
+float Evaluate(PASTNode node);

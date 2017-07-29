@@ -52,7 +52,7 @@ begin
   ANodeMul.Left := ANodeValue_2;
   ANodeMul.Right := ANodeValue_3;
 
-  Result := Evualate(ANodePlus);
+  Result := Evaluate(ANodePlus);
 
   Writeln('Sonuç : ' + FloatToStr(Result));
 

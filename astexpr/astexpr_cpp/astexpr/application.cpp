@@ -34,7 +34,7 @@ PASTNode CreateTestNodes()
 
 int main()
 {
-	float result = Evualate(CreateTestNodes());
+	float result = Evaluate(CreateTestNodes());
 	cout << "Sonuç : " << result;
 
 	return 0;

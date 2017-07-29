@@ -29,7 +29,7 @@ type
   end;
 
 function IsNodeTypeEqual(ANode: TASTNode; AType: TASTNodeType): Boolean;
-function Evualate(ANode: TASTNode): double;
+function Evaluate(ANode: TASTNode): double;
 
 implementation
 
@@ -48,22 +48,22 @@ begin
   Result := ANode.NodeType = AType;
 end;
 
-function Evualate(ANode: TASTNode): double;
+function Evaluate(ANode: TASTNode): double;
 begin
   if (ANode.Value <> 0) then
     Result := ANode.Value;
 
   if IsNodeTypeEqual(ANode, NtPlus) then
-    Result := Evualate(ANode.Left) + Evualate(ANode.Right);
+    Result := Evaluate(ANode.Left) + Evaluate(ANode.Right);
 
   if IsNodeTypeEqual(ANode, NtMinus) then
-    Result := Evualate(ANode.Left) - Evualate(ANode.Right);
+    Result := Evaluate(ANode.Left) - Evaluate(ANode.Right);
 
   if IsNodeTypeEqual(ANode, NtDiv) then
-    Result := Evualate(ANode.Left) / Evualate(ANode.Right);
+    Result := Evaluate(ANode.Left) / Evaluate(ANode.Right);
 
   if IsNodeTypeEqual(ANode, NtMul) then
-    Result := Evualate(ANode.Left) * Evualate(ANode.Right);
+    Result := Evaluate(ANode.Left) * Evaluate(ANode.Right);
 end;
 
 destructor TASTNode.Destroy;

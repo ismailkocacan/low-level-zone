@@ -73,7 +73,7 @@ bool IsNodeTypeEqual(PASTNode node, ASTNodeType nodeType)
 
 */
 
-float Evualate(PASTNode node)
+float Evaluate(PASTNode node)
 {
 	if (node->GetValue() != NULL)
 	{
@@ -82,22 +82,22 @@ float Evualate(PASTNode node)
 
 	if (IsNodeTypeEqual(node, ASTNodeType::PLUS))
 	{
-		return Evualate(node->GetLeft()) + Evualate(node->GetRight());
+		return Evaluate(node->GetLeft()) + Evaluate(node->GetRight());
 	}
 
 	if (IsNodeTypeEqual(node, ASTNodeType::MINUS))
 	{
-		return Evualate(node->GetLeft()) - Evualate(node->GetRight());
+		return Evaluate(node->GetLeft()) - Evaluate(node->GetRight());
 	}
 
 	if (IsNodeTypeEqual(node, ASTNodeType::DIV))
 	{
 		// check division by zero ?
-		return Evualate(node->GetLeft()) / Evualate(node->GetRight());
+		return Evaluate(node->GetLeft()) / Evaluate(node->GetRight());
 	}
 
 	if (IsNodeTypeEqual(node, ASTNodeType::MUL))
 	{
-		return Evualate(node->GetLeft()) * Evualate(node->GetRight());
+		return Evaluate(node->GetLeft()) * Evaluate(node->GetRight());
 	}
 }

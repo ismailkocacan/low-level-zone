@@ -61,6 +61,10 @@ bool IsNodeTypeEqual(PASTNode node, ASTNodeType nodeType)
 	return node->GetType() == nodeType;
 }
 
+bool IsNodeTypeEqual(PASTNode2 node, ASTNodeType nodeType)
+{
+	return node->Type == nodeType;
+}
 
 /*
    1 + 2 * 3 
@@ -99,5 +103,35 @@ float Evaluate(PASTNode node)
 	if (IsNodeTypeEqual(node, ASTNodeType::MUL))
 	{
 		return Evaluate(node->GetLeft()) * Evaluate(node->GetRight());
+	}
+}
+
+
+float Evaluate(PASTNode2 node)
+{
+	if (node->Value != NULL)
+	{
+		return node->Value;
+	}
+
+	if (IsNodeTypeEqual(node, ASTNodeType::PLUS))
+	{
+		return Evaluate(node->Left) + Evaluate(node->Right);
+	}
+
+	if (IsNodeTypeEqual(node, ASTNodeType::MINUS))
+	{
+		return Evaluate(node->Left) - Evaluate(node->Right);
+	}
+
+	if (IsNodeTypeEqual(node, ASTNodeType::DIV))
+	{
+		// check division by zero ?
+		return Evaluate(node->Left) / Evaluate(node->Right);
+	}
+
+	if (IsNodeTypeEqual(node, ASTNodeType::MUL))
+	{
+		return Evaluate(node->Left) * Evaluate(node->Right);
 	}
 }

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <typeinfo>
+#include <Windows.h>
 #include "ast.h"
 
 using namespace std;
@@ -32,10 +33,46 @@ PASTNode CreateTestNodes()
 	return nodePlus;
 }
 
+
 int main()
 {
-	float result = Evaluate(CreateTestNodes());
-	cout << "Sonuç : " << result;
+	DWORD start, finish;
+	float result = 0;
+
+	start = GetTickCount();
+	result = Evaluate(CreateTestNodes());
+	finish = GetTickCount();
+	cout << "Result : " << result << endl;
+	cout << "Time Diff Heap (ms) : " << int(finish - start) << endl;
+
+
+
+	start = GetTickCount();
+	ASTNode2 A2NodePlus;
+	A2NodePlus.Type = ASTNodeType::PLUS;
+
+	ASTNode2 A2NodeValue_1;
+	A2NodeValue_1.Value = 1;
+
+	ASTNode2 A2NodeMul;
+	A2NodeMul.Type = ASTNodeType::MUL;
+
+	ASTNode2 A2NodeValue_2;
+	ASTNode2 A2NodeValue_3;
+	A2NodeValue_2.Value = 2;
+	A2NodeValue_3.Value = 3;
+
+	A2NodeMul.Left = &A2NodeValue_2;
+	A2NodeMul.Right = &A2NodeValue_3;
+
+	A2NodePlus.Left = &A2NodeValue_1;
+	A2NodePlus.Right = &A2NodeMul;
+
+	result = Evaluate(&A2NodePlus);
+	finish = GetTickCount();
+	cout << "Result : " << result << endl;
+	cout << "Time Diff Stack (ms): " << int(finish - start) << endl;
+
 
 	return 0;
 }

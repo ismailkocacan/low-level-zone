@@ -34,5 +34,18 @@ public:
 typedef ASTNode* PASTNode;
 
 
+
+typedef struct ASTNode2
+{
+	float Value = 0;
+	ASTNodeType Type;
+	ASTNode2* Left;
+	ASTNode2* Right;
+} *PASTNode2;
+
+
 bool IsNodeTypeEqual(PASTNode node, ASTNodeType nodeType);
+bool IsNodeTypeEqual(PASTNode2 node, ASTNodeType nodeType);
+
 float Evaluate(PASTNode node);
+float Evaluate(PASTNode2 node);

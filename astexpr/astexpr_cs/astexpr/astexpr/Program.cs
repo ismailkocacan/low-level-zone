@@ -1,18 +1,66 @@
 ﻿/*
-   1 + 2 * 3 
+   1 + 2 * 3  
 
 	'+'
    /   \
  '1'    *
       /   \ 
     '2'   '3'
+
+-----------------------------------
+1 + 2 * 3      => expression
+x              => variable 
+
+x = 1 + 2 * 3  => assignment statement
+
+
+  assignment node 
+   /            \
+ variable       expression
+  x                	'+'
+                   /   \
+                 '1'    *
+                      /   \ 
+                    '2'   '3'    
+-----------------------------------
+
 */
 
 using System;
+using System.Collections.Generic;
 
 namespace astexpr
 {
+
+    class SymbolTable : Dictionary<string, object>
+    {
+
+    }
+
     enum ASTNodeType
+    {
+        Assignment = 0,
+        Variable = 1,
+        Expression = 2
+    }
+
+    class ASTNode
+    {
+        public ASTNode Left { get; set; }
+        public ASTNode Right { get; set; }
+
+        public ASTNodeType NodeType { get; set; }
+
+        public ASTNode(ASTNodeType type)
+        {
+            this.NodeType = type;
+            Left = null;
+            Right = null;
+        }
+    }
+
+
+    enum ExpressionNodeType
     {
         UNDEFINED = 0,
         PLUS = 1,
@@ -20,13 +68,14 @@ namespace astexpr
         DIV = 3,
         MUL = 4
     };
-
-    class ASTNode
+    class ExpressionNode : ASTNode
     {
         public int Value { get; set; }
-        public ASTNodeType Type { get; set; }
-        public ASTNode Left { get; set; }
-        public ASTNode Right { get; set; }
+        public ExpressionNodeType Type { get; set; }
+
+
+        public new ExpressionNode Left { get; set; }
+        public new ExpressionNode Right { get; set; }
 
         void SetChildDefaultValues()
         {
@@ -34,65 +83,96 @@ namespace astexpr
             Right = null;
         }
 
-        public ASTNode()
+        public ExpressionNode() :
+            base(ASTNodeType.Expression)
         {
-            Type = ASTNodeType.UNDEFINED;
+            Type = ExpressionNodeType.UNDEFINED;
             Value = 0;
             SetChildDefaultValues();
         }
 
 
-        public ASTNode(int value)
+        public ExpressionNode(int value) :
+            base(ASTNodeType.Expression)
         {
-            Type = ASTNodeType.UNDEFINED;
+            Type = ExpressionNodeType.UNDEFINED;
             Value = value;
             SetChildDefaultValues();
         }
 
-        public ASTNode(ASTNodeType nodeType)
+        public ExpressionNode(ExpressionNodeType nodeType) :
+            base(ASTNodeType.Expression)
         {
             Type = nodeType;
             Value = 0;
             SetChildDefaultValues();
         }
-      
-        public static ASTNode Create(int value)
+
+        public static ExpressionNode Create(int value)
         {
-            return new ASTNode(value);
+            return new ExpressionNode(value);
         }
 
-        public static ASTNode Create(ASTNodeType nodeType)
+        public static ExpressionNode Create(ExpressionNodeType nodeType)
         {
-            return new ASTNode(nodeType);
+            return new ExpressionNode(nodeType);
         }
     }
 
-    class Program
+    class AssignmentNode : ASTNode
     {
-        static float Evaluate(ASTNode node)
+        public AssignmentNode() :
+            base(ASTNodeType.Assignment)
+        {
+
+        }
+    }
+
+    class VariableNode : ASTNode
+    {
+        public string Name { get; set; }
+
+        public VariableNode(string name) :
+            base(ASTNodeType.Variable)
+        {
+            this.Name = name;
+        }
+    }
+
+
+    class ASTInterpreter
+    {
+        SymbolTable symbolTable = new SymbolTable();
+
+        public ASTInterpreter()
+        {
+
+        }
+
+        public float Evaluate(ExpressionNode node)
         {
             if (node.Value != 0)
             {
                 return node.Value;
             }
 
-            if (node.Type == ASTNodeType.PLUS)
+            if (node.Type == ExpressionNodeType.PLUS)
             {
                 return Evaluate(node.Left) + Evaluate(node.Right);
             }
 
-            if (node.Type == ASTNodeType.MINUS)
+            if (node.Type == ExpressionNodeType.MINUS)
             {
                 return Evaluate(node.Left) - Evaluate(node.Right);
             }
 
-            if (node.Type == ASTNodeType.DIV)
+            if (node.Type == ExpressionNodeType.DIV)
             {
                 // check division by zero ?
                 return Evaluate(node.Left) / Evaluate(node.Right);
             }
 
-            if (node.Type == ASTNodeType.MUL)
+            if (node.Type == ExpressionNodeType.MUL)
             {
                 return Evaluate(node.Left) * Evaluate(node.Right);
             }
@@ -100,12 +180,11 @@ namespace astexpr
             return 0.0f;
         }
 
- 
-        static void PrintNodes(ASTNode node)
+        public void PrintExpressionNodes(ExpressionNode node)
         {
             if (node == null) return;
 
-            if (node.Type != ASTNodeType.UNDEFINED)
+            if (node.Type != ExpressionNodeType.UNDEFINED)
             {
                 Console.WriteLine(node.Type.ToString());
                 Console.WriteLine(@"/  \");
@@ -115,34 +194,66 @@ namespace astexpr
                 Console.Write(node.Value.ToString() + " ");
             }
 
-            PrintNodes(node.Left);
-            PrintNodes(node.Right);
+            PrintExpressionNodes(node.Left);
+            PrintExpressionNodes(node.Right);
         }
 
+        public float Interpret(ASTNode node)
+        {
+            if (node == null) return 0.0f;
 
+            if (node.NodeType == ASTNodeType.Assignment)
+            {
+
+                string variableName = ((VariableNode)node.Left).Name;
+                if (!symbolTable.ContainsKey(variableName)) symbolTable.Add(variableName, 0);
+
+                if (node.Right.NodeType == ASTNodeType.Expression)
+                    symbolTable[variableName] = Evaluate((ExpressionNode)node.Right);
+
+                return (float)symbolTable[variableName];
+            }
+
+            if (node.NodeType == ASTNodeType.Expression)
+            {
+                return Evaluate(node as ExpressionNode);
+            }
+
+            return 0.0f;
+        }
+    }
+
+    class Program
+    {
         static void Main(string[] args)
         {
-            ASTNode nodePlus = ASTNode.Create(ASTNodeType.PLUS);
-            ASTNode nodeValue_1 = ASTNode.Create(1);
+            ExpressionNode exprNodePlus = ExpressionNode.Create(ExpressionNodeType.PLUS);
+            ExpressionNode nodeValue_1 = ExpressionNode.Create(1);
 
-            ASTNode nodeMul = ASTNode.Create(ASTNodeType.MUL);
-            ASTNode nodeValue_2 = ASTNode.Create(2);
-            ASTNode nodeValue_3 = ASTNode.Create(3);
-           
-            nodePlus.Left = nodeValue_1;
-            nodePlus.Right = nodeMul;
+            ExpressionNode nodeMul = ExpressionNode.Create(ExpressionNodeType.MUL);
+            ExpressionNode nodeValue_2 = ExpressionNode.Create(2);
+            ExpressionNode nodeValue_3 = ExpressionNode.Create(3);
+
+            exprNodePlus.Left = nodeValue_1;
+            exprNodePlus.Right = nodeMul;
 
             nodeMul.Left = nodeValue_2;
             nodeMul.Right = nodeValue_3;
 
-            PrintNodes(nodePlus);
+            AssignmentNode assignmentNode = new AssignmentNode();
+            assignmentNode.Left = new VariableNode("x");
+            assignmentNode.Right = exprNodePlus;
 
             float result = 0.0f;
-            result = Evaluate(nodePlus);
+            ASTInterpreter interpreter = new ASTInterpreter();
+            interpreter.PrintExpressionNodes(exprNodePlus);
+
+            result = interpreter.Interpret(assignmentNode);
+            result = interpreter.Interpret(exprNodePlus);
 
             Console.WriteLine(Environment.NewLine);
             Console.WriteLine(result);
-           
+
         }
     }
 }

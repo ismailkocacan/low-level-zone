@@ -1,2 +1,2 @@
-# try-misc
-contains some coding fantasy
+# Experiment
+Personal experiments

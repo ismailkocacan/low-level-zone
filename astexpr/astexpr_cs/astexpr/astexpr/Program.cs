@@ -32,7 +32,7 @@ using System.Collections.Generic;
 namespace astexpr
 {
 
-    class SymbolTable : Dictionary<string, object>
+    class HashTable : Dictionary<string, object>
     {
 
     }
@@ -142,7 +142,7 @@ namespace astexpr
 
     class ASTInterpreter
     {
-        SymbolTable symbolTable = new SymbolTable();
+        HashTable hashTable = new HashTable();
 
         public ASTInterpreter()
         {
@@ -206,12 +206,12 @@ namespace astexpr
             {
 
                 string variableName = ((VariableNode)node.Left).Name;
-                if (!symbolTable.ContainsKey(variableName)) symbolTable.Add(variableName, 0);
+                if (!hashTable.ContainsKey(variableName)) hashTable.Add(variableName, 0);
 
                 if (node.Right.NodeType == ASTNodeType.Expression)
-                    symbolTable[variableName] = Evaluate((ExpressionNode)node.Right);
+                    hashTable[variableName] = Evaluate((ExpressionNode)node.Right);
 
-                return (float)symbolTable[variableName];
+                return (float)hashTable[variableName];
             }
 
             if (node.NodeType == ASTNodeType.Expression)

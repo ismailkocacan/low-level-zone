@@ -10,7 +10,7 @@ uses
 
 type
 
-  TSymbolTable = class(TDictionary<string, Variant>)
+  THashTable = class(TDictionary<string, Variant>)
   end;
 
   TASTNodeType = (Assignment = 0, Variable = 1, Expression = 2);
@@ -63,7 +63,7 @@ type
 
   TASTInterpreter = class
   private
-    FSymbolTable: TSymbolTable;
+    FHashTable: THashTable;
     function IsNodeTypeEqual(ANode: TExpressionNode;
       AType: TExpressionNodeType): Boolean;
     function Evaluate(ANode: TExpressionNode): double;
@@ -125,7 +125,7 @@ end;
 { TASTInterpreter }
 constructor TASTInterpreter.Create;
 begin
-  FSymbolTable := TSymbolTable.Create();
+  FHashTable := THashTable.Create();
 end;
 
 { TASTInterpreter }
@@ -165,11 +165,11 @@ begin
   if ANode.NodeType = TASTNodeType.Assignment then
   begin
     VariableName := (ANode.Left as TVariableNode).Name;
-    if not FSymbolTable.ContainsKey(VariableName) then
-      FSymbolTable.Add(VariableName, 0);
+    if not FHashTable.ContainsKey(VariableName) then
+      FHashTable.Add(VariableName, 0);
 
-    FSymbolTable[VariableName] := Evaluate(ANode.FRight as TExpressionNode);
-    Result := FSymbolTable[VariableName];
+    FHashTable[VariableName] := Evaluate(ANode.FRight as TExpressionNode);
+    Result := FHashTable[VariableName];
   end;
 
   if ANode.NodeType = TASTNodeType.Expression then

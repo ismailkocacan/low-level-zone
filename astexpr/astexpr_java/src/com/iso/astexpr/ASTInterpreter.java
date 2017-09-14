@@ -2,7 +2,7 @@ package com.iso.astexpr;
 
 public class ASTInterpreter
 {
-    private SymbolTable symbolTable;
+    private HashTable hashTable;
 
     public ASTInterpreter()
     {
@@ -62,12 +62,12 @@ public class ASTInterpreter
         if (node.getNodeType() == ASTNodeType.Assignment)
         {
             String variableName = ((VariableNode)node.getLeft()).getName();
-            if (!symbolTable.containsKey(variableName)) symbolTable.put(variableName, 0);
+            if (!hashTable.containsKey(variableName)) hashTable.put(variableName, 0);
 
             if (node.getRight().getNodeType() == ASTNodeType.Expression)
-                symbolTable.put(variableName,evaluate((ExpressionNode)node.getRight()));
+                hashTable.put(variableName,evaluate((ExpressionNode)node.getRight()));
 
-            return (double)symbolTable.get(variableName);
+            return (double)hashTable.get(variableName);
         }
 
         if (node.getNodeType() == ASTNodeType.Expression)

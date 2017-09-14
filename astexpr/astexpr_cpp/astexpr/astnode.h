@@ -13,7 +13,7 @@ enum ASTNodeType
 
 class ASTNode
 {
-protected:
+private:
 	ASTNodeType nodeType;
 	ASTNode* left;
 	ASTNode* right;

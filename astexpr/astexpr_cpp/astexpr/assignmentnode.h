@@ -16,5 +16,5 @@ public:
 };
 
 typedef AssignmentNode* PAssignmentNode;
-#endif // ! ASSIGNMENTNODE_H
+#endif
 

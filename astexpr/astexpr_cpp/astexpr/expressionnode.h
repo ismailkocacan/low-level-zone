@@ -31,4 +31,4 @@ public:
 
 typedef ExpressionNode* PExpressionNode;
 
-#endif EXPRESSIONNODE_H
+#endif

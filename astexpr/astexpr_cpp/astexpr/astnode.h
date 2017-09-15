@@ -32,4 +32,4 @@ public:
 
 typedef ASTNode* PASTNode;
 
-#endif AST_H
+#endif

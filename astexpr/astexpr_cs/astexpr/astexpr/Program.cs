@@ -28,6 +28,9 @@ x = 1 + 2 * 3  => assignment statement
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace astexpr
 {
@@ -37,6 +40,7 @@ namespace astexpr
 
     }
 
+    [Serializable]
     enum ASTNodeType
     {
         Assignment = 0,
@@ -44,6 +48,9 @@ namespace astexpr
         Expression = 2
     }
 
+
+
+    [Serializable]
     class ASTNode
     {
         public ASTNode Left { get; set; }
@@ -59,7 +66,7 @@ namespace astexpr
         }
     }
 
-
+    [Serializable]
     enum ExpressionNodeType
     {
         UNDEFINED = 0,
@@ -68,6 +75,8 @@ namespace astexpr
         DIV = 3,
         MUL = 4
     };
+
+    [Serializable]
     class ExpressionNode : ASTNode
     {
         public int Value { get; set; }
@@ -119,6 +128,7 @@ namespace astexpr
         }
     }
 
+    [Serializable]
     class AssignmentNode : ASTNode
     {
         public AssignmentNode() :
@@ -128,6 +138,7 @@ namespace astexpr
         }
     }
 
+    [Serializable]
     class VariableNode : ASTNode
     {
         public string Name { get; set; }
@@ -223,6 +234,39 @@ namespace astexpr
         }
     }
 
+
+    interface ISerialization
+    {
+        void SaveToFile<T>(string filePath, T rootObject);
+        T ReadFromFile<T>(string filePath);
+    }
+
+    public class ASTBinarySerialization : ISerialization
+    {
+        public T ReadFromFile<T>(string filePath)
+        {
+            T result;
+            using (Stream stream = File.Open(filePath, FileMode.Open))
+            {
+                IFormatter formatter = new BinaryFormatter();
+                result = (T)formatter.Deserialize(stream);
+                stream.Close();
+            }
+            return result;
+        }
+
+        public void SaveToFile<T>(string filePath, T rootObject)
+        {
+            using (Stream stream = File.Open(filePath, FileMode.Create))
+            {
+                IFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(stream, rootObject);
+                stream.Close();
+            }
+        }
+    }
+
+
     class Program
     {
         static void Main(string[] args)
@@ -243,7 +287,7 @@ namespace astexpr
             AssignmentNode assignmentNode = new AssignmentNode();
             assignmentNode.Left = new VariableNode("x");
             assignmentNode.Right = exprNodePlus;
-
+            
             float result = 0.0f;
             ASTInterpreter interpreter = new ASTInterpreter();
             interpreter.PrintExpressionNodes(exprNodePlus);
@@ -254,6 +298,14 @@ namespace astexpr
             Console.WriteLine(Environment.NewLine);
             Console.WriteLine(result);
 
+
+            ISerialization serialization = new ASTBinarySerialization();
+            serialization.SaveToFile<ASTNode>("ast.bin", exprNodePlus);
+            ExpressionNode rootNode = serialization.ReadFromFile<ExpressionNode>("ast.bin");
+            float result2 = 0.0f;
+            ASTInterpreter interpreter2 = new ASTInterpreter();
+            interpreter2.PrintExpressionNodes(rootNode);
+            result2 = interpreter.Interpret(rootNode);
         }
     }
 }

@@ -51,8 +51,6 @@ typedef struct ASTNode{
 typedef struct ASTExpressionNode{
    struct ASTNode astNode;
    enum ExpressionNodeType type;
-   struct ASTExpressionNode* left;
-   struct ASTExpressionNode* right;
    int value;
 } *PASTExpressionNode;
 
@@ -108,11 +106,13 @@ Pointer createNode(enum ASTNodeType type){
 
 float evaluate(PASTExpressionNode node){
     if (node->value != 0) return node->value;
+    PASTExpressionNode left = (PASTExpressionNode)node->astNode.left;
+    PASTExpressionNode right = (PASTExpressionNode)node->astNode.right;
     switch (node->type) {
-        case PLUS: return evaluate(node->left) + evaluate(node->right);
-        case MINUS: return evaluate(node->left) - evaluate(node->right);
-        case DIV: return evaluate(node->left) / evaluate(node->right);
-        case MUL: return evaluate(node->left) * evaluate(node->right);
+        case PLUS: return evaluate(left) + evaluate(right);
+        case MINUS: return evaluate(left) - evaluate(right);
+        case DIV: return evaluate(left) / evaluate(right);
+        case MUL: return evaluate(left) * evaluate(right);
         default:{
             return 0.0f;
         }
@@ -152,10 +152,10 @@ int main() {
     PASTExpressionNode nodeValue_3  = createNode(Expression);
     nodeValue_3->value = 3;
 
-    exprNodePlus->left = nodeValue_1;
-    exprNodePlus->right = nodeMul;
-    nodeMul->left = nodeValue_2;
-    nodeMul->right = nodeValue_3;
+    exprNodePlus->astNode.left = nodeValue_1;
+    exprNodePlus->astNode.right = nodeMul;
+    nodeMul->astNode.left = nodeValue_2;
+    nodeMul->astNode.right = nodeValue_3;
 
     PASTAssignmentNode assignmentNode = createNode(Assignment);
     PASTVariableNode variableNode = createNode(Variable);

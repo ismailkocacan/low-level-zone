@@ -44,8 +44,8 @@ enum ExpressionNodeType{
 
 typedef struct ASTNode{
    Pointer data;
-   Pointer left;
-   Pointer right;
+   struct ASTNode* left;
+   struct ASTNode* right;
    enum ASTNodeType nodeType;
 } *PASTNode;
 

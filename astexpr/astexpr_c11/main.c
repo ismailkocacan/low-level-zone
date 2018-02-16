@@ -55,11 +55,6 @@ typedef struct ASTVariableNode{
    char variableName[20];
 } *PASTVariableNode;
 
-typedef struct NodeX{
-   Pointer node;
-   enum ASTNodeType nodeType;
-} *PNodeX;
-
 Pointer new(size_t size){
    Pointer  p = malloc(size);
    pointers[i] = p;

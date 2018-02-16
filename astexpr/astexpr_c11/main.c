@@ -32,8 +32,10 @@ Pointer pointers[1024];
 enum ASTNodeType{
     Assignment = 0,
     Variable = 1,
-    Expression = 2,
+    Operator = 2,
+    Value = 3
 };
+
 enum ExpressionNodeType{
     UNDEFINED = 0,
     PLUS = 1,

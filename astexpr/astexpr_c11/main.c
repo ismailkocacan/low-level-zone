@@ -52,7 +52,6 @@ typedef struct ASTNode{
 } *PASTNode;
 
 typedef struct ASTVariableNode{
-   struct ASTNode astNode;
    char variableName[20];
 } *PASTVariableNode;
 

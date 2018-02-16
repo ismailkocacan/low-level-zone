@@ -23,11 +23,8 @@ x = 1 + 2 * 3  => assignment statement
 #include <stdlib.h>
 #include <string.h>
 
-int i = 0;
-
 typedef void* Pointer;
 typedef int* PInt;
-Pointer pointers[1024];
 
 enum ASTNodeType{
     Assignment = 0,
@@ -61,8 +58,6 @@ typedef struct ASTVariableNode{
 
 Pointer new(size_t size){
    Pointer  p = malloc(size);
-   pointers[i] = p;
-   i++;
    return p;
 };
 
@@ -121,9 +116,9 @@ void freeNode(PASTNode node){
     if (node){
         freeNode(node->left);
         freeNode(node->right);
-        if (node->data) free(node->data);
+        if (node->data) delete(node->data);
         node->data = NULL;
-        free(node);
+        delete(node);
         node = NULL;
     }
 }
@@ -182,11 +177,5 @@ int main() {
 
     freeNode(nodeAssignment);
 
-    int count = sizeof(pointers) / sizeof(Pointer);
-    for (int j = 0; j < count; j++) {
-        if (!pointers[j]) break;
-        delete(pointers[j]);
-        pointers[j] = NULL;
-    }
     return 0;
 }

@@ -51,12 +51,6 @@ typedef struct ASTNode{
    enum ASTNodeType nodeType;
 } *PASTNode;
 
-typedef struct ASTExpressionNode{
-   struct ASTNode astNode;
-   enum ExpressionNodeType type;
-   int value;
-} *PASTExpressionNode;
-
 typedef struct ASTVariableNode{
    struct ASTNode astNode;
    char variableName[20];

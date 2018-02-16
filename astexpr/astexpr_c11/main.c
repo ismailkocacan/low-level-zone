@@ -26,6 +26,21 @@ x = 1 + 2 * 3  => assignment statement
 typedef void* Pointer;
 typedef int* PInt;
 
+const char* cASTNodeType[] = {
+   "Assignment",
+   "Variable",
+   "Operator",
+   "Value"
+};
+
+const char* cASTOperatorType[] = {
+   "UnDefined",
+   "+",
+   "-",
+   "/",
+   "*"
+};
+
 enum ASTNodeType{
     Assignment = 0,
     Variable = 1,
@@ -123,6 +138,46 @@ void freeNode(PASTNode node){
     }
 }
 
+void walk(FILE* file,PASTNode node){
+    if (node){
+        const char* strType = cASTNodeType[node->nodeType];
+        switch (node->nodeType){
+            case Assignment:{
+                fprintf(file,"%s %s \n",strType,"=");
+                break;
+            }
+            case Value:{
+                int value = (*(PInt)node->data);
+                fprintf(file,"%s %d \n",strType,value);
+                break;
+            }
+            case Operator:{
+                PASTOperatorNode opData = (PASTOperatorNode)node->data;
+                fprintf(file,"%s %s \n",strType, cASTOperatorType[opData->value]);
+                break;
+            }
+            case Variable:{
+                PASTVariableNode varNode = (PASTVariableNode)node->data;
+                fprintf(file,"%s %s \n",strType, varNode->variableName);
+                break;
+            }
+            default:{
+                // ??
+            }
+        }
+        walk(file,node->left);
+        walk(file,node->right);
+    }
+}
+
+void print(PASTNode node){
+    FILE* file = fopen("ast.txt","w");
+    if (file){
+        walk(file,node);
+        fclose(file);
+    }
+}
+
 int main() {
     PASTNode nodeAssignment,
             nodeVariable,
@@ -174,6 +229,8 @@ int main() {
 
     float result1 = interpret(nodeAssignment);
     printf("result1 : %f",result1);
+
+    print(nodeAssignment);
 
     freeNode(nodeAssignment);
 

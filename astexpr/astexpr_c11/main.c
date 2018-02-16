@@ -67,28 +67,12 @@ void delete(Pointer ptr){
 }
 
 Pointer createNode(enum ASTNodeType type){
-    switch (type){
-        case Assignment: {
-            PASTAssignmentNode node = new(sizeof(struct ASTAssignmentNode));
-            node->astNode.nodeType = Assignment;
-            return node;
-        }
-        case Expression: {
-            PASTExpressionNode node = new(sizeof(struct ASTExpressionNode));
-            node->value = 0;
-            node->type = UNDEFINED;
-            node->astNode.nodeType = Expression;
-            return node;
-        }
-        case Variable: {
-            PASTVariableNode node = new(sizeof(struct ASTVariableNode));
-            node->astNode.nodeType = Variable;
-            return node;
-        }
-        default:{
-            return NULL;
-        }
-    }
+    PASTNode node = new(sizeof(struct ASTNode));
+    node->data = NULL;
+    node->left = NULL;
+    node->right = NULL;
+    node->nodeType = type;
+    return node;
 };
 
 float evaluate(PASTExpressionNode node){

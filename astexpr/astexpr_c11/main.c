@@ -57,10 +57,6 @@ typedef struct ASTExpressionNode{
    int value;
 } *PASTExpressionNode;
 
-typedef struct ASTAssignmentNode{
-   struct ASTNode astNode;
-} *PASTAssignmentNode;
-
 typedef struct ASTVariableNode{
    struct ASTNode astNode;
    char variableName[20];

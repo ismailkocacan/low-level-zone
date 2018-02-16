@@ -117,6 +117,17 @@ float interpret(PASTNode node) {
     }
 }
 
+void freeNode(PASTNode node){
+    if (node){
+        freeNode(node->left);
+        freeNode(node->right);
+        if (node->data) free(node->data);
+        node->data = NULL;
+        free(node);
+        node = NULL;
+    }
+}
+
 int main() {
     PASTNode nodeAssignment,
             nodeVariable,
@@ -168,6 +179,8 @@ int main() {
 
     float result1 = interpret(nodeAssignment);
     printf("result1 : %f",result1);
+
+    freeNode(nodeAssignment);
 
     int count = sizeof(pointers) / sizeof(Pointer);
     for (int j = 0; j < count; j++) {

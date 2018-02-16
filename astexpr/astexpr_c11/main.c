@@ -65,7 +65,7 @@ void delete(Pointer ptr){
    free(ptr);
 }
 
-Pointer createNode(enum ASTNodeType type){
+PASTNode createNode(enum ASTNodeType type){
     PASTNode node = new(sizeof(struct ASTNode));
     node->data = NULL;
     node->left = NULL;

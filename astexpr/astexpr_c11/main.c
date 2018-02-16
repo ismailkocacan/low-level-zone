@@ -36,12 +36,12 @@ enum ASTNodeType{
     Value = 3
 };
 
-enum ExpressionNodeType{
-    UNDEFINED = 0,
-    PLUS = 1,
-    MINUS = 2,
-    DIV = 3,
-    MUL = 4
+enum ASTOperatorType{
+    UnDefined = 0,
+    Plus = 1,
+    Minus = 2,
+    Div = 3,
+    Mul = 4
 };
 
 typedef struct ASTNode{

@@ -23,6 +23,7 @@ x = 1 + 2 * 3  => assignment statement
 #include <stdlib.h>
 #include <string.h>
 
+int refCount = 0;
 typedef void* Pointer;
 typedef int* PInt;
 
@@ -73,11 +74,14 @@ typedef struct ASTVariableNode{
 
 Pointer new(size_t size){
    Pointer  p = malloc(size);
+   refCount++;
    return p;
 };
 
 void delete(Pointer ptr){
    free(ptr);
+   ptr = NULL;
+   refCount--;
 }
 
 PASTNode createNode(enum ASTNodeType type){
@@ -132,9 +136,7 @@ void freeNode(PASTNode node){
         freeNode(node->left);
         freeNode(node->right);
         if (node->data) delete(node->data);
-        node->data = NULL;
         delete(node);
-        node = NULL;
     }
 }
 
@@ -230,9 +232,13 @@ int main() {
     float result1 = interpret(nodeAssignment);
     printf("result1 : %f",result1);
 
+
     print(nodeAssignment);
 
     freeNode(nodeAssignment);
+
+    PASTNode leakNode = createNode(Variable);
+    if (refCount) fprintf(stderr, "%s (ref count:%d)", "Memory leak detected !\n",refCount);
 
     return 0;
 }

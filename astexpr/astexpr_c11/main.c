@@ -61,6 +61,7 @@ typedef struct ASTNode{
    Pointer data;
    struct ASTNode* left;
    struct ASTNode* right;
+   struct ASTNode* parent;
    enum ASTNodeType nodeType;
 } *PASTNode;
 
@@ -84,11 +85,12 @@ void delete(Pointer ptr){
    refCount--;
 }
 
-PASTNode createNode(enum ASTNodeType type){
+PASTNode createNode(enum ASTNodeType type,PASTNode parent){
     PASTNode node = new(sizeof(struct ASTNode));
     node->data = NULL;
     node->left = NULL;
     node->right = NULL;
+    node->parent = parent;
     node->nodeType = type;
     return node;
 };
@@ -189,32 +191,32 @@ int main() {
             nodeValue_2,
             nodeValue_3;
 
-    nodeAssignment = createNode(Assignment);
+    nodeAssignment = createNode(Assignment,NULL); // ana düğüm
 
-    nodeVariable = createNode(Variable);
+    nodeVariable = createNode(Variable,nodeAssignment);
     PASTVariableNode varNode = new(sizeof(struct ASTVariableNode));
     strcpy(varNode->variableName,"x");
     nodeVariable->data = varNode;
 
-    nodeOperatorPlus = createNode(Operator);
+    nodeOperatorPlus = createNode(Operator,nodeAssignment);
     PASTOperatorNode opDataPlus = new(sizeof(struct ASTOperatorNode));
     opDataPlus->value = Plus;
     nodeOperatorPlus->data = opDataPlus;
 
-    nodeOperatorMul = createNode(Operator);
+    nodeOperatorMul = createNode(Operator,nodeOperatorPlus);
     PASTOperatorNode opDataMul = new(sizeof(struct ASTOperatorNode));
     opDataMul->value = Mul;
     nodeOperatorMul->data = opDataMul;
 
-    nodeValue_1 = createNode(Value);
+    nodeValue_1 = createNode(Value,nodeOperatorPlus);
     nodeValue_1->data = new(sizeof(int));
     (*(PInt)nodeValue_1->data) = 1;
 
-    nodeValue_2 = createNode(Value);
+    nodeValue_2 = createNode(Value,nodeOperatorMul);
     nodeValue_2->data = new(sizeof(int));
     (*(PInt)nodeValue_2->data) = 2;
 
-    nodeValue_3 = createNode(Value);
+    nodeValue_3 = createNode(Value,nodeOperatorMul);
     nodeValue_3->data = new(sizeof(int));
     (*(PInt)nodeValue_3->data) = 3;
 
@@ -237,7 +239,7 @@ int main() {
 
     freeNode(nodeAssignment);
 
-    PASTNode leakNode = createNode(Variable);
+    PASTNode leakNode = createNode(Variable,NULL);
     if (refCount) fprintf(stderr, "%s (ref count:%d)", "Memory leak detected !\n",refCount);
 
     return 0;

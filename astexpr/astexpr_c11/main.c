@@ -137,7 +137,7 @@ void freeNode(PASTNode node){
     if (node){
         freeNode(node->left);
         freeNode(node->right);
-        if (node->data) delete(node->data);
+        delete(node->data);
         delete(node);
     }
 }

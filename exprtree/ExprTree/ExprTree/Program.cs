@@ -1,5 +1,17 @@
-﻿using System;
+using System;
 using System.Linq.Expressions;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
+
+public class Calculate
+{
+    public int Calc(int x, int y)
+    {
+        return x * y;
+    }
+}
+
 class Program
 {
     static void Main(string[] args)

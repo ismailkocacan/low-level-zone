@@ -13,10 +13,18 @@ class Program
         BinaryExpression binaryExp2 = Expression.Assign(variableExp2, consExp2);
 
         BinaryExpression exp3 = Expression.Add(variableExp, variableExp2);
+        NewExpression newExpr = Expression.New(typeof(Calculate));
+       
+        MethodCallExpression methodCallExpr = Expression.Call(
+            newExpr, 
+            typeof(Calculate).GetMethod("Calc"), 
+            new Expression[] { variableExp, variableExp2 }
+            );
+
 
         BlockExpression blockExp = Expression.Block(
             new ParameterExpression[] { variableExp, variableExp2 },
-            binaryExp, binaryExp2, exp3
+            binaryExp, binaryExp2, exp3, newExpr, methodCallExpr
         );
 
         Console.WriteLine(blockExp.ToString());

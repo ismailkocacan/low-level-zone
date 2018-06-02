@@ -10,6 +10,6 @@ int main()
 	PVOID P = VirtualAlloc(NULL, CODE_SIZE, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 	memcpy(P, BYTE_CODE, CODE_SIZE);
 	FunctionPtr functionPtr = (FunctionPtr)P;
-	VirtualFree(P, CODE_SIZE, MEM_RELEASE);
 	int result = functionPtr();
+	VirtualFree(P, CODE_SIZE, MEM_RELEASE);
 }

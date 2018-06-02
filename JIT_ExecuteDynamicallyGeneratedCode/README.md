@@ -1,3 +1,3 @@
 The Byte Code
 ===========
-![ScreenShot](/tests/dbg.gif)
+![ScreenShot](tests/dbg.gif)

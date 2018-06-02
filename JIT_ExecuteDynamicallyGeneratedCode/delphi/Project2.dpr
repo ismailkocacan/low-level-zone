@@ -23,5 +23,5 @@ begin
   CopyMemory(P, @BYTE_CODE, CODE_SIZE);
   FunctionPtr := TFunctionPtr(P);
   Result := FunctionPtr();
-  VirtualFree(P, MEM_RELEASE, CODE_SIZE);
+  VirtualFree(P, CODE_SIZE, MEM_RELEASE);
 end.

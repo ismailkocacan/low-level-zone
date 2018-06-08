@@ -1,20 +1,19 @@
 #include <iostream>
 #include <fstream>
+using namespace std;
 
 typedef struct Node {
     int iValue;
     float fValue;
     char cValue[20];
-    struct Node* prev;
-    struct Node* next;
-} *PNode;
+    Node* prev;
+    Node* next;
+} Node, *PNode;
 
-using namespace std;
-
-void writeFile(struct Node node){
+void writeFile(PNode node,size_t size){
     ofstream file;
     file.open("file.bin",ios::binary);
-    file.write((char*)&node, sizeof(node));
+    file.write((char*)node, size);
     file.close();
 }
 
@@ -34,16 +33,16 @@ void readFile(PNode node){
 }
 
 int main() {
-    struct Node node1 = { 31, 31.1f, "node1", NULL, NULL };
-    struct Node node2 = { 32, 32.2f, "node2", NULL, NULL };
-    struct Node node3 = { 33, 33.3f, "node2", NULL, NULL };
+    Node node1 = { 31, 31.1f, "node1", NULL, NULL };
+    Node node2 = { 32, 32.2f, "node2", NULL, NULL };
+    Node node3 = { 33, 33.3f, "node2", NULL, NULL };
     node1.next = &node2;
     node2.prev = &node1;
     node2.next = &node3;
     node3.prev = &node2;
-    writeFile(node1);
+    writeFile(&node1, sizeof(node1));
 
-    struct Node node = {0};
+    Node node = {0};
     readFile(&node);
 
     PNode ptrNode = &node;

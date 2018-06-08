@@ -42,36 +42,36 @@ const char* cASTOperatorType[] = {
    "*"
 };
 
-enum ASTNodeType{
+typedef enum ASTNodeType{
     Assignment = 0,
     Variable = 1,
     Operator = 2,
     Value = 3
-};
+} ASTNodeType;
 
-enum ASTOperatorType{
+typedef enum ASTOperatorType{
     UnDefined = 0,
     Plus = 1,
     Minus = 2,
     Div = 3,
     Mul = 4
-};
+} ASTOperatorType;
 
 typedef struct ASTNode{
    Pointer data;
    struct ASTNode* left;
    struct ASTNode* right;
    struct ASTNode* parent;
-   enum ASTNodeType nodeType;
-} *PASTNode;
+   ASTNodeType nodeType;
+} ASTNode, *PASTNode;
 
 typedef struct ASTOperatorNode{
-    enum ASTOperatorType value;
-} *PASTOperatorNode;
+    ASTOperatorType value;
+} ASTOperatorNode, *PASTOperatorNode;
 
 typedef struct ASTVariableNode{
    char variableName[20];
-} *PASTVariableNode;
+} ASTVariableNode, *PASTVariableNode;
 
 Pointer new(size_t size){
    Pointer  p = malloc(size);
@@ -85,8 +85,8 @@ void delete(Pointer ptr){
    refCount--;
 }
 
-PASTNode createNode(enum ASTNodeType type,PASTNode parent){
-    PASTNode node = new(sizeof(struct ASTNode));
+PASTNode createNode(ASTNodeType type,PASTNode parent){
+    PASTNode node = new(sizeof(ASTNode));
     node->data = NULL;
     node->left = NULL;
     node->right = NULL;
@@ -194,17 +194,17 @@ int main() {
     nodeAssignment = createNode(Assignment,NULL); // ana düğüm
 
     nodeVariable = createNode(Variable,nodeAssignment);
-    PASTVariableNode varNode = new(sizeof(struct ASTVariableNode));
+    PASTVariableNode varNode = new(sizeof(ASTVariableNode));
     strcpy(varNode->variableName,"x");
     nodeVariable->data = varNode;
 
     nodeOperatorPlus = createNode(Operator,nodeAssignment);
-    PASTOperatorNode opDataPlus = new(sizeof(struct ASTOperatorNode));
+    PASTOperatorNode opDataPlus = new(sizeof(ASTOperatorNode));
     opDataPlus->value = Plus;
     nodeOperatorPlus->data = opDataPlus;
 
     nodeOperatorMul = createNode(Operator,nodeOperatorPlus);
-    PASTOperatorNode opDataMul = new(sizeof(struct ASTOperatorNode));
+    PASTOperatorNode opDataMul = new(sizeof(ASTOperatorNode));
     opDataMul->value = Mul;
     nodeOperatorMul->data = opDataMul;
 

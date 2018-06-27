@@ -81,18 +81,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />
-    <ClCompile Include="assignmentnode.cpp" />
-    <ClCompile Include="astinterpreter.cpp" />
-    <ClCompile Include="astnode.cpp" />
-    <ClCompile Include="expressionnode.cpp" />
-    <ClCompile Include="variablenode.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="assignmentnode.h" />
-    <ClInclude Include="astinterpreter.h" />
-    <ClInclude Include="astnode.h" />
-    <ClInclude Include="expressionnode.h" />
-    <ClInclude Include="variablenode.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

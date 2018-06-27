@@ -18,37 +18,5 @@
     <ClCompile Include="application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="astnode.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="expressionnode.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="assignmentnode.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="variablenode.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="astinterpreter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="astnode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="expressionnode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="assignmentnode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="variablenode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="astinterpreter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

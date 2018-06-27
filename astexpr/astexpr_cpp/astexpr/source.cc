@@ -1,9 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <map>
-#include <string>
-#include <Windows.h>
-#include <typeinfo>
+#include <chrono>
 
 using namespace std;
 
@@ -69,6 +67,7 @@ private:
 public:
 	int GetValue();
 	ExpressionNodeType GetType();
+	//https://en.cppreference.com/w/cpp/language/operator_comparison
 	bool operator==(const ExpressionNodeType nodeType);
 public:
 	ExpressionNode(int value);
@@ -326,17 +325,17 @@ PASTNode CreateTestNodes()
 
 int main()
 {
-	DWORD start, finish;
+	clock_t start, finish;
 	float result = 0;
-	start = GetTickCount();
-
+	start = clock();
+	
 	PASTNode root = CreateTestNodes();
 	shared_ptr<ASTInterpreter> interpreter(new ASTInterpreter(root));
 	result = interpreter->Interpret();
-	finish = GetTickCount();
+	finish = clock();
 
 	cout << "Result : " << result << endl;
-	cout << "Time Diff (ms) : " << int(finish - start) << endl;
+	cout << "Time Diff (ms) : " << 1000.0 * (finish - start) / CLOCKS_PER_SEC << endl;
 
 	return 0;
 }

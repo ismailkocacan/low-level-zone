@@ -69,6 +69,7 @@ private:
 public:
 	int GetValue();
 	ExpressionNodeType GetType();
+	bool operator==(const ExpressionNodeType nodeType);
 public:
 	ExpressionNode(int value);
 	ExpressionNode(ExpressionNodeType type);
@@ -96,7 +97,6 @@ private:
 	map<string, float> hashTable;
 private:
 	float Evaluate(PExpressionNode node);
-	bool IsNodeTypeEqual(PExpressionNode node, ExpressionNodeType nodeType);
 public:
 	float Interpret();
 public:
@@ -213,6 +213,11 @@ ExpressionNodeType ExpressionNode::GetType()
 	return this->type;
 }
 
+bool ExpressionNode::operator==(const ExpressionNodeType nodeType)
+{
+	return this->type == nodeType;
+}
+
 
 AssignmentNode::AssignmentNode() :
 	ASTNode(ASTNodeType::Assignment)
@@ -243,38 +248,33 @@ float ASTInterpreter::Evaluate(PExpressionNode node)
 {
 	if (node->GetValue() != 0)
 		return node->GetValue();
-
-	if (IsNodeTypeEqual(node, ExpressionNodeType::PLUS))
+	
+	if (*node == ExpressionNodeType::PLUS)
 	{
 		return Evaluate(dynamic_cast<PExpressionNode>(node->GetLeft())) +
 			Evaluate(dynamic_cast<PExpressionNode>(node->GetRight()));
 	}
 
-	if (IsNodeTypeEqual(node, ExpressionNodeType::MINUS))
+	if (*node == ExpressionNodeType::MINUS)
 	{
 		return Evaluate(dynamic_cast<PExpressionNode>(node->GetLeft())) -
 			Evaluate(dynamic_cast<PExpressionNode>(node->GetRight()));
 	}
 
-	if (IsNodeTypeEqual(node, ExpressionNodeType::DIV))
+	if (*node == ExpressionNodeType::DIV)
 	{
 		// check division by zero ?
 		return Evaluate(dynamic_cast<PExpressionNode>(node->GetLeft())) /
 			Evaluate(dynamic_cast<PExpressionNode>(node->GetRight()));
 	}
 
-	if (IsNodeTypeEqual(node, ExpressionNodeType::MUL))
+	if (*node == ExpressionNodeType::MUL)
 	{
 		return Evaluate(dynamic_cast<PExpressionNode>(node->GetLeft())) *
 			Evaluate(dynamic_cast<PExpressionNode>(node->GetRight()));
 	}
 
 	return 0.0f;
-}
-
-bool ASTInterpreter::IsNodeTypeEqual(PExpressionNode node, ExpressionNodeType nodeType)
-{
-	return node->GetType() == nodeType;
 }
 
 float ASTInterpreter::Interpret()

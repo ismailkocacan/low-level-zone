@@ -5,8 +5,7 @@
 #include <iostream>
 
 template <class Type>
-class DynamicArray
-{
+class DynamicArray{
 private:
 	int fLength;
 	Type* fMemBlock;
@@ -20,16 +19,26 @@ public:
 	}
 public:
 	Type GetElement(int index) {
-
+		// check out of range
+		Type* p = (fMemBlock + (sizeof(Type) * index));
+		return *p;
 	}
 
-	Type SetElement(int index) {
-
+	void SetElement(int index, Type value) {
+		// check out of range
+		Type* p = (fMemBlock + (sizeof(Type) * index));
+		*p = value;
 	}
 };
 
 int main() {
+
 	DynamicArray<int> myArray(2);
+	myArray.SetElement(0, 10);
+	myArray.SetElement(1, 20);
+	int value = myArray.GetElement(0);
+	value = myArray.GetElement(1);
+
 	std::cout << "hede hedöö" << std::endl;
 	return 0;
 }

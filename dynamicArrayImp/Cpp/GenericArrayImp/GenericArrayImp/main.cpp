@@ -29,6 +29,11 @@ public:
 		Type* p = (fMemBlock + (sizeof(Type) * index));
 		*p = value;
 	}
+public:
+	Type& operator[](int index) {
+		Type* p = (fMemBlock + (sizeof(Type) * index));
+		return *p;
+	}
 };
 
 int main() {
@@ -38,6 +43,11 @@ int main() {
 	myArray.SetElement(1, 20);
 	int value = myArray.GetElement(0);
 	value = myArray.GetElement(1);
+	
+	myArray[0] = 31;
+	myArray[1] = 32;
+	value = myArray[0];
+	value = myArray[1];
 
 	std::cout << "hede hedöö" << std::endl;
 	return 0;

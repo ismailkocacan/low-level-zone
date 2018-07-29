@@ -1,4 +1,7 @@
-
+/*
+ Author : isocan
+ Purpose : How to implement dynamic array using pointer math and more generic.
+*/
 #include <iostream>
 
 template <class Type>

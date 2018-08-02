@@ -3,6 +3,8 @@
  Purpose : How to implement dynamic array using pointer math and more generic.
 */
 #include <iostream>
+#include <windows.h>
+
 
 typedef struct _Data {
 	int value;
@@ -12,14 +14,25 @@ template <class Type>
 class DynamicArray{
 private:
 	int fLength;
+	int fSize;
 	Type* fMemBlock;
 public:
 	DynamicArray(size_t length) :
-		fLength(length) {
-		fMemBlock = (Type*)malloc(sizeof(Type) * fLength);
+	    fLength(length) {
+
+	   fSize = sizeof(Type) * fLength;
+       #ifdef WIN32
+		 fMemBlock = (Type*)VirtualAlloc(NULL, fSize, MEM_COMMIT, PAGE_READWRITE);
+       #elif
+		 fMemBlock = (Type*)malloc(sizeof(Type) * fLength);
+       #endif
 	}
 	~DynamicArray() {
+      #ifdef WIN32
+		VirtualFree(fMemBlock, fSize, MEM_RELEASE);
+      #elif
 		free(fMemBlock);
+      #endif
 	}
 public:
 	Type GetElement(int index) {

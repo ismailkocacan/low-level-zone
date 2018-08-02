@@ -4,6 +4,10 @@
 */
 #include <iostream>
 
+typedef struct _Data {
+	int value;
+} Data, *PData;
+
 template <class Type>
 class DynamicArray{
 private:
@@ -22,6 +26,12 @@ public:
 		// check out of range
 		Type* p = (fMemBlock + (sizeof(Type) * index));
 		return *p;
+	}
+
+	Type* GetElementPointer(int index) {
+		// check out of range
+		Type* p = (fMemBlock + (sizeof(Type) * index));
+		return p;
 	}
 
 	void SetElement(int index, Type value) {
@@ -43,12 +53,18 @@ int main() {
 	myArray.SetElement(1, 20);
 	int value = myArray.GetElement(0);
 	value = myArray.GetElement(1);
-	
+	value = *myArray.GetElementPointer(1);
+
 	myArray[0] = 31;
 	myArray[1] = 32;
 	value = myArray[0];
 	value = myArray[1];
+	
 
-	std::cout << "hede hedöö" << std::endl;
+	DynamicArray<Data> dataArray(2);
+	dataArray[0].value = 50;
+	value = dataArray[0].value;
+	PData dataPtr = dataArray.GetElementPointer(0);
+	
 	return 0;
 }

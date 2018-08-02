@@ -39,6 +39,14 @@ public:
 		Type* p = (fMemBlock + (sizeof(Type) * index));
 		*p = value;
 	}
+
+	void SaveToFile(std::string filePath) {
+		// to do
+	}
+
+	static DynamicArray LoadFromFile(std::string filePath) {
+		// to do
+	}
 public:
 	Type& operator[](int index) {
 		Type* p = (fMemBlock + (sizeof(Type) * index));
@@ -59,7 +67,7 @@ int main() {
 	myArray[1] = 32;
 	value = myArray[0];
 	value = myArray[1];
-	
+	 
 
 	DynamicArray<Data> dataArray(2);
 	dataArray[0].value = 50;

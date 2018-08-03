@@ -127,9 +127,9 @@ int main() {
 		dataArray[1].value = 36;
 		dataArray.Serialize("data_array.bin");
 
-		DynamicArray<int> dataArray2("data_array.bin");
-		int test = dataArray2.GetElement(0);
-		int test2 = dataArray2.GetElement(1);
+		DynamicArray<Data> dataArray2("data_array.bin");
+		int test = dataArray2.GetElement(0).value;
+		int test2 = dataArray2.GetElement(1).value;
 
 		value = dataArray[0].value;
 		PData dataPtr = dataArray.GetElementPointer(0);

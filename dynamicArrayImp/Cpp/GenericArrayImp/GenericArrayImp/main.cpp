@@ -44,19 +44,16 @@ public:
 	}
 public:
 	Type GetElement(int index) {
-		// check out of range
 		Type* p = (fMemBlock + Offset(index));
 		return *p;
 	}
 
 	Type* GetElementPointer(int index) {
-		// check out of range
 		Type* p = (fMemBlock + Offset(index));
 		return p;
 	}
 
 	void SetElement(int index, Type value) {
-		// check out of range
 		Type* p = (fMemBlock + Offset(index));
 		*p = value;
 	}

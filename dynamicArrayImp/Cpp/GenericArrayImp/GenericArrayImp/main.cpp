@@ -3,6 +3,7 @@
  Purpose : How to implement dynamic array using pointer math and more generic.
 */
 #include <iostream>
+#include <string>
 #include <windows.h>
 
 
@@ -17,8 +18,10 @@ private:
 	int fSize;
 	Type* fMemBlock;
 private:
+	//https://www.wikiwand.com/en/Offset_(computer_science)
 	int Offset(int index) {
-		//https://www.wikiwand.com/en/Offset_(computer_science)
+		if (index < 0 || index > fLength) 
+			throw std::runtime_error("IndexOutOfRangeException at "+ std::to_string(index));
 		return sizeof(Type) * index;
 	}
 public:
@@ -87,10 +90,17 @@ int main() {
 	value = myArray[1];
 	 
 
-	DynamicArray<Data> dataArray(2);
-	dataArray[0].value = 50;
-	value = dataArray[0].value;
-	PData dataPtr = dataArray.GetElementPointer(0);
-	
+	try
+	{
+		DynamicArray<Data> dataArray(2);
+		dataArray[0].value = 50;
+		value = dataArray[0].value;
+		PData dataPtr = dataArray.GetElementPointer(0);
+		PData dataPtr2 = dataArray.GetElementPointer(30);
+	}
+	catch (const std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+	}
 	return 0;
 }

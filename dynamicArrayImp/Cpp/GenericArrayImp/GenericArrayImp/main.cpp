@@ -82,6 +82,14 @@ public:
 		*p = value;
 	}
 
+	int GetLength() {
+		return fLength;
+	}
+
+	int GetSize() {
+		return fSize;
+	}
+
 	void Serialize(std::string filePath) {
 		std::ofstream file;
 		file.open(filePath.c_str(), std::ios::binary);

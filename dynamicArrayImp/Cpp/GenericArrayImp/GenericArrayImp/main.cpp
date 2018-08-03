@@ -3,9 +3,9 @@
  Purpose : How to implement dynamic array using pointer math and more generic.
 */
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <windows.h>
-
 
 typedef struct _Data {
 	int value;
@@ -35,6 +35,30 @@ public:
 		 fMemBlock = (Type*)malloc(sizeof(Type) * fLength);
        #endif
 	}
+
+	DynamicArray(std::string filePath){
+		int typeSize = 0;
+		int fileSize = 0;
+		std::ifstream file;
+		file.open(filePath, std::ios::binary);
+		file.seekg(0, std::ios::end);
+		fileSize = (int)file.tellg();
+		file.seekg(0, std::ios::beg);
+		file.read((char*)&typeSize, sizeof(int));
+		
+		fSize = fileSize - typeSize;
+		fLength = fSize / typeSize;
+		
+		file.seekg(sizeof(int));
+        #ifdef WIN32
+		   fMemBlock = (Type*)VirtualAlloc(NULL, fSize, MEM_COMMIT, PAGE_READWRITE);
+        #elif
+		   fMemBlock = (Type*)malloc(sizeof(Type) * fLength);
+        #endif
+		file.read((char*)&fMemBlock, fSize);
+		file.close();
+	}
+
 	~DynamicArray() {
       #ifdef WIN32
 		VirtualFree(fMemBlock, fSize, MEM_RELEASE);
@@ -58,12 +82,13 @@ public:
 		*p = value;
 	}
 
-	void SaveToFile(std::string filePath) {
-		// to do
-	}
-
-	static DynamicArray LoadFromFile(std::string filePath) {
-		// to do
+	void Serialize(std::string filePath) {
+		std::ofstream file;
+		file.open(filePath.c_str(), std::ios::binary);
+		int typeSize = sizeof(Type); // first 4 byte is size of data type.
+		file.write((char*)&typeSize, sizeof(int)); 
+		file.write((char*)&fMemBlock, fSize);
+		file.close();
 	}
 public:
 	Type& operator[](int index) {
@@ -91,6 +116,13 @@ int main() {
 	{
 		DynamicArray<Data> dataArray(2);
 		dataArray[0].value = 50;
+		dataArray[1].value = 36;
+		dataArray.Serialize("data_array.bin");
+
+		DynamicArray<int> dataArray2("data_array.bin");
+		int test = dataArray2.GetElement(0);
+		int test2 = dataArray2.GetElement(1);
+
 		value = dataArray[0].value;
 		PData dataPtr = dataArray.GetElementPointer(0);
 		PData dataPtr2 = dataArray.GetElementPointer(30);

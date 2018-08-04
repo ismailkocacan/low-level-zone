@@ -1,0 +1,6 @@
+﻿  main.cpp
+c:\users\isocan\desktop\experimentalworks\dynamicarrayimp\cpp\genericarrayimp\genericarrayimp\main.cpp(29): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  c:\users\isocan\desktop\experimentalworks\dynamicarrayimp\cpp\genericarrayimp\genericarrayimp\main.cpp(28): note: while compiling class template member function 'DynamicArray<Data>::DynamicArray(::size_t)'
+  c:\users\isocan\desktop\experimentalworks\dynamicarrayimp\cpp\genericarrayimp\genericarrayimp\main.cpp(125): note: see reference to function template instantiation 'DynamicArray<Data>::DynamicArray(::size_t)' being compiled
+  c:\users\isocan\desktop\experimentalworks\dynamicarrayimp\cpp\genericarrayimp\genericarrayimp\main.cpp(125): note: see reference to class template instantiation 'DynamicArray<Data>' being compiled
+  GenericArrayImp.vcxproj -> C:\Users\isocan\Desktop\ExperimentalWorks\dynamicArrayImp\Cpp\GenericArrayImp\x64\Debug\GenericArrayImp.exe

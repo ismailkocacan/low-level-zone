@@ -13,6 +13,44 @@ typedef struct _Data {
 	int value;
 } Data, *PData;
 
+
+typedef struct _PageRange {
+	int StartIndex;
+	int EndIndex;
+} PageRange, *PPageRange;
+
+class Paging {
+private:
+	int fPageCount;
+	int fCount;
+	int fPageSize;
+private:
+	int GetStartPageIndex(int pageNo) {
+		return (pageNo * fPageSize) - fPageSize;
+	}
+	int GetEndPageIndex(int pageNo) {
+		if (pageNo % fPageSize != 0 && pageNo == fPageCount) {
+			return fCount - 1;
+		}
+		return (GetStartPageIndex(pageNo) + fPageSize) - 1;
+	}
+public:
+	int GetPageCount(int count, int pageSize) {
+		fCount = count;
+		fPageSize = pageSize;
+		if (count % pageSize == 0)
+			fPageCount = count / pageSize;
+		else
+			fPageCount = (count / pageSize) + 1;
+		return fPageCount;
+	}
+	PageRange GetPageRange(int pageNo) {
+		PageRange range;
+		range.StartIndex = GetStartPageIndex(pageNo);
+		range.EndIndex = GetEndPageIndex(pageNo);
+	}
+};
+
 template <class Type>
 class DynamicArray{
 private:
@@ -68,7 +106,7 @@ public:
 		free(fMemBlock);
       #endif
 	}
-public:
+public:	Paging fPaging;
 	Type GetElement(int index) {
 		Type* p = (fMemBlock + Offset(index));
 		return *p;
@@ -121,7 +159,7 @@ int main() {
 	value = myArray[0];
 	value = myArray[1];
 	 
-
+	
 	try
 	{
 		DynamicArray<Data> dataArray(2);

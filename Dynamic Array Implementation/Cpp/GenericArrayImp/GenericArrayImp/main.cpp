@@ -5,7 +5,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#ifdef WIN32
 #include <windows.h>
+#endif
 
 typedef struct _Data {
 	int value;
@@ -31,7 +33,7 @@ public:
 	   fSize = sizeof(Type) * fLength;
        #ifdef WIN32
 		 fMemBlock = (Type*)VirtualAlloc(NULL, fSize, MEM_COMMIT, PAGE_READWRITE);
-       #elif
+       #else
 		 fMemBlock = (Type*)malloc(sizeof(Type) * fLength);
        #endif
 	}
@@ -52,7 +54,7 @@ public:
 		file.seekg(sizeof(int));
         #ifdef WIN32
 		   fMemBlock = (Type*)VirtualAlloc(NULL, fSize, MEM_COMMIT, PAGE_READWRITE);
-        #elif
+        #else
 		   fMemBlock = (Type*)malloc(sizeof(Type) * fLength);
         #endif
 		file.read((char*)&fMemBlock, fSize);
@@ -62,7 +64,7 @@ public:
 	~DynamicArray() {
       #ifdef WIN32
 		VirtualFree(fMemBlock, fSize, MEM_RELEASE);
-      #elif
+      #else
 		free(fMemBlock);
       #endif
 	}

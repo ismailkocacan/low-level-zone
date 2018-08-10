@@ -106,7 +106,7 @@ public:
 		free(fMemBlock);
       #endif
 	}
-public:	Paging fPaging;
+public:	 
 	Type GetElement(int index) {
 		Type* p = (fMemBlock + Offset(index));
 		return *p;

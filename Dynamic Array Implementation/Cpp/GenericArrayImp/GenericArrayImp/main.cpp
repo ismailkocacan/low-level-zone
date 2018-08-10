@@ -11,7 +11,6 @@ int main() {
 	DynamicArray<int> myArray(2);
 	myArray.SetElement(0, 10);
 	myArray.SetElement(1, 20);
-	myArray.SetElement(2, 20);
 	int value = myArray.GetElement(0);
 	value = myArray.GetElement(1);
 	value = *myArray.GetElementPointer(1);

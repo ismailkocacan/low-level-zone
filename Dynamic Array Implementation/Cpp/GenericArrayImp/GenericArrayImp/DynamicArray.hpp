@@ -56,17 +56,20 @@ private:
 	int fLength;
 	int fSize;
 	Type* fMemBlock;
+	bool fRangeChecking;
 private:
 	//https://www.wikiwand.com/en/Offset_(computer_science)
 	int Offset(int index) {
-		if (index < 0 || index > fLength - 1)
-			throw std::runtime_error("IndexOutOfRangeException at " + std::to_string(index));
+		if (fRangeChecking) {
+		   if (index < 0 || index > fLength - 1)
+			  throw std::runtime_error("IndexOutOfRangeException at " + std::to_string(index));
+		}
 		return sizeof(Type) * index;
 	}
 public:
 	DynamicArray(size_t length) :
 		fLength(length) {
-
+		RangeChecking(true);
 		fSize = sizeof(Type) * fLength;
         #ifdef WIN32
 		  fMemBlock = (Type*)VirtualAlloc(NULL, fSize, MEM_COMMIT, PAGE_READWRITE);
@@ -76,6 +79,7 @@ public:
 	}
 
 	DynamicArray(std::string filePath) {
+		RangeChecking(true);
 		int typeSize = 0;
 		int fileSize = 0;
 		std::ifstream file;
@@ -127,6 +131,10 @@ public:
 
 	int GetSize() {
 		return fSize;
+	}
+
+	void RangeChecking(bool value) {
+		fRangeChecking = value;
 	}
 
 	void Serialize(std::string filePath) {

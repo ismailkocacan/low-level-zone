@@ -13,11 +13,6 @@ Purpose : How to implement dynamic array using pointer math and more generic.
 #include <windows.h>
 #endif
 
-typedef struct _Data {
-	int value;
-} Data, *PData;
-
-
 typedef struct _PageRange {
 	int StartIndex;
 	int EndIndex;

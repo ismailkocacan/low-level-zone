@@ -1,5 +1,11 @@
 #include "DynamicArray.hpp"
 
+
+typedef struct _Data {
+	int value;
+} Data, *PData;
+
+
 int main() {
 
 	DynamicArray<int> myArray(2);

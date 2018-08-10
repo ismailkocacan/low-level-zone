@@ -59,7 +59,7 @@ private:
 private:
 	//https://www.wikiwand.com/en/Offset_(computer_science)
 	int Offset(int index) {
-		if (index < 0 || index > fLength)
+		if (index < 0 || index > fLength - 1)
 			throw std::runtime_error("IndexOutOfRangeException at " + std::to_string(index));
 		return sizeof(Type) * index;
 	}

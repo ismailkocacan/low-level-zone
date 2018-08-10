@@ -8,7 +8,7 @@ typedef struct _Data {
 
 int main() {
 
-	DynamicArray<int> myArray(2);
+	iso::DynamicArray<int> myArray(2);
 	myArray.SetElement(0, 10);
 	myArray.SetElement(1, 20);
 	int value = myArray.GetElement(0);
@@ -23,12 +23,12 @@ int main() {
 	
 	try
 	{
-		DynamicArray<Data> dataArray(2);
+		iso::DynamicArray<Data> dataArray(2);
 		dataArray[0].value = 50;
 		dataArray[1].value = 36;
 		dataArray.Serialize("data_array.bin");
 
-		DynamicArray<Data> dataArray2("data_array.bin");
+		iso::DynamicArray<Data> dataArray2("data_array.bin");
 		int test = dataArray2.GetElement(0).value;
 		int test2 = dataArray2.GetElement(1).value;
 

@@ -13,6 +13,8 @@ Purpose : How to implement dynamic array using pointer math and more generic.
 #include <windows.h>
 #endif
 
+namespace iso {
+
 typedef struct _PageRange {
 	int StartIndex;
 	int EndIndex;
@@ -151,4 +153,6 @@ public:
 		return *p;
 	}
 };
+
+} // namespace
 #endif

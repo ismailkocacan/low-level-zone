@@ -14,7 +14,8 @@ unit DynamicArray;
 interface
 
 uses
-  Winapi.Windows;
+  Winapi.Windows,
+  System.SysUtils;
 
 
 type
@@ -24,6 +25,7 @@ type
     FLength: NativeInt;
     FSize :NativeInt;
     FMemBlock: ^T;
+    FRangeChecking : Boolean;
   private
     function GetData(Index: Integer): T;
     procedure SetData(Index: Integer; Value: T);
@@ -32,16 +34,20 @@ type
     constructor Create(ALength: NativeInt);
     destructor Destroy();
   public
+    property RangeChecking: Boolean read FRangeChecking write FRangeChecking;
     property MemorySize: NativeInt read FSize;
     property Length: NativeInt read FLength;
     property Item[Index: Integer]: T read GetData write SetData; default;
   end;
+
+const IndexOutOfRangeException = 'IndexOutOfRangeException at %d';
 
 implementation
 
 { TDynamicArray<T> }
 constructor TDynamicArray<T>.Create(ALength: NativeInt);
 begin
+   FRangeChecking := true;
    FLength := ALength;
    FSize := sizeof(T) * FLength;
    {$IFDEF Win32}
@@ -78,6 +84,9 @@ end;
 
 function TDynamicArray<T>.Offset(Index: Integer): Integer;
 begin
+  if (FRangeChecking) then
+   if (Index < 0) or (Index > FLength-1 ) then
+     raise Exception.Create(Format(IndexOutOfRangeException,[Index]));
   Result := SizeOf(T) * Index;
 end;
 

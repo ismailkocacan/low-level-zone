@@ -14,7 +14,7 @@ unit DynamicArray;
 interface
 
 uses
-  System.SysUtils;
+  Winapi.Windows;
 
 
 type
@@ -22,12 +22,14 @@ type
   TDynamicArray<T> = class
   private
     FLength: NativeInt;
+    FSize :NativeInt;
     FMemBlock: ^T;
   private
     function GetData(Index: Integer): T;
     procedure SetData(Index: Integer; Value: T);
   public
     constructor Create(ALength: NativeInt);
+    destructor Destroy();
     property Item[Index: Integer]: T read GetData write SetData;
   end;
 
@@ -36,7 +38,22 @@ implementation
 { TDynamicArray<T> }
 constructor TDynamicArray<T>.Create(ALength: NativeInt);
 begin
-  // to do
+   FLength := ALength;
+   FSize := sizeof(T) * FLength;
+   {$IFDEF Win32}
+     FMemBlock := VirtualAlloc(nil,FSize,MEM_COMMIT,PAGE_READWRITE);
+   {$ELSE}
+    //
+   {$ENDIF}
+end;
+
+destructor TDynamicArray<T>.Destroy;
+begin
+   {$IFDEF Win32}
+     VirtualFree(FMemBlock,FSize,MEM_RELEASE);
+   {$ELSE}
+    //
+   {$ENDIF}
 end;
 
 function TDynamicArray<T>.GetData(Index: Integer): T;

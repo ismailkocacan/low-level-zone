@@ -76,7 +76,7 @@ function TDynamicArray<T>.GetElement(Index: Integer): T;
 var
  P : PT;
 begin
-  P := Pointer(PByte(FMemBlock) + Offset(Index));
+  P := PT(PByte(FMemBlock) + Offset(Index));
   Result := P^;
 end;
 
@@ -84,7 +84,7 @@ procedure TDynamicArray<T>.SetElement(Index: Integer; Value: T);
 var
  P : PT;
 begin
-  P := Pointer(PByte(FMemBlock) + Offset(Index));
+  P := PT(PByte(FMemBlock) + Offset(Index));
   P^ := Value;
 end;
 
@@ -115,7 +115,7 @@ function TDynamicArray<T>.GetElementPointer(Index: Integer): PT;
 var
  P : PT;
 begin
-  P := Pointer(PByte(FMemBlock) + Offset(Index));
+  P := PT(PByte(FMemBlock) + Offset(Index));
   Result := P;
 end;
 

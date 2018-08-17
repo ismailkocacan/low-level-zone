@@ -22,10 +22,12 @@ uses
 type
 
   TDynamicArray<T> = class
+  type
+    PT = ^T;
   private
     FLength: NativeInt;
     FSize :NativeInt;
-    FMemBlock: ^T;
+    FMemBlock: PT;
     FRangeChecking : Boolean;
   private
     function GetData(Index: Integer): T;
@@ -71,7 +73,7 @@ end;
 
 function TDynamicArray<T>.GetData(Index: Integer): T;
 var
- P : ^T;
+ P : PT;
 begin
   P := Pointer(PByte(FMemBlock) + Offset(Index));
   Result := P^;
@@ -79,7 +81,7 @@ end;
 
 procedure TDynamicArray<T>.SetData(Index: Integer; Value: T);
 var
- P : ^T;
+ P : PT;
 begin
   P := Pointer(PByte(FMemBlock) + Offset(Index));
   P^ := Value;

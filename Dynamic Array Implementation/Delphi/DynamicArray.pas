@@ -27,10 +27,11 @@ type
   private
     function GetData(Index: Integer): T;
     procedure SetData(Index: Integer; Value: T);
+    function Offset(Index:Integer):Integer;
   public
     constructor Create(ALength: NativeInt);
     destructor Destroy();
-    property Item[Index: Integer]: T read GetData write SetData;
+    property Item[Index: Integer]: T read GetData write SetData; default;
   end;
 
 implementation
@@ -57,13 +58,25 @@ begin
 end;
 
 function TDynamicArray<T>.GetData(Index: Integer): T;
+var
+ P : ^T;
 begin
-
+  P := Pointer(PByte(FMemBlock) + Offset(Index));
+  Result := P^;
 end;
 
 procedure TDynamicArray<T>.SetData(Index: Integer; Value: T);
+var
+ P : ^T;
 begin
-
+  P := Pointer(PByte(FMemBlock) + Offset(Index));
+  P^ := Value;
 end;
+
+function TDynamicArray<T>.Offset(Index: Integer): Integer;
+begin
+  Result := SizeOf(T) * Index;
+end;
+
 
 end.

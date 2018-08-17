@@ -10,13 +10,11 @@ uses
 
 var
   MyArray : TDynamicArray<Integer>;
+  Value : Integer;
 begin
   MyArray := TDynamicArray<Integer>.Create(2);
-  try
-    { TODO -oUser -cConsole Main : Insert code here }
-  except
-    on E: Exception do
-      Writeln(E.ClassName, ': ', E.Message);
-  end;
+  MyArray[0] := 34;
+  MyArray[1] := 35;
+  Value := MyArray[1];
   MyArray.Free;
 end.

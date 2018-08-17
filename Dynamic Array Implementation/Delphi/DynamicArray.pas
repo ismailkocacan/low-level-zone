@@ -30,19 +30,20 @@ type
     FMemBlock: PT;
     FRangeChecking : Boolean;
   private
-    function GetData(Index: Integer): T;
-    procedure SetData(Index: Integer; Value: T);
+    function GetElement(Index: Integer): T;
+    procedure SetElement(Index: Integer; Value: T);
     function Offset(Index:Integer):Integer;
   public
     constructor Create(ALength: NativeInt);
     destructor Destroy();
   public
     procedure Serialize(const AFilePath:string);
+    function  GetElementPointer(Index:Integer):PT;
   public
     property RangeChecking: Boolean read FRangeChecking write FRangeChecking;
     property MemorySize: NativeInt read FSize;
     property Length: NativeInt read FLength;
-    property Item[Index: Integer]: T read GetData write SetData; default;
+    property Element[Index: Integer]: T read GetElement write SetElement; default;
   end;
 
 const IndexOutOfRangeException = 'IndexOutOfRangeException at %d';
@@ -71,7 +72,7 @@ begin
    {$ENDIF}
 end;
 
-function TDynamicArray<T>.GetData(Index: Integer): T;
+function TDynamicArray<T>.GetElement(Index: Integer): T;
 var
  P : PT;
 begin
@@ -79,7 +80,7 @@ begin
   Result := P^;
 end;
 
-procedure TDynamicArray<T>.SetData(Index: Integer; Value: T);
+procedure TDynamicArray<T>.SetElement(Index: Integer; Value: T);
 var
  P : PT;
 begin
@@ -108,6 +109,14 @@ begin
  finally
   AFileStream.Free;
  end;
+end;
+
+function TDynamicArray<T>.GetElementPointer(Index: Integer): PT;
+var
+ P : PT;
+begin
+  P := Pointer(PByte(FMemBlock) + Offset(Index));
+  Result := P;
 end;
 
 

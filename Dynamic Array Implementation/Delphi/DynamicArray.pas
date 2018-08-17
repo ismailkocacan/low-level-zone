@@ -31,6 +31,7 @@ type
   public
     constructor Create(ALength: NativeInt);
     destructor Destroy();
+  public
     property MemorySize: NativeInt read FSize;
     property Length: NativeInt read FLength;
     property Item[Index: Integer]: T read GetData write SetData; default;

@@ -34,7 +34,8 @@ type
     procedure SetElement(Index: Integer; Value: T);
     function Offset(Index:Integer):Integer;
   public
-    constructor Create(ALength: NativeInt);
+    constructor Create(ALength: NativeInt); overload;
+    constructor Create(const AFilePath:string); overload;
     destructor Destroy();
   public
     procedure Serialize(const AFilePath:string);
@@ -61,6 +62,21 @@ begin
    {$ELSE}
     //
    {$ENDIF}
+end;
+
+constructor TDynamicArray<T>.Create(const AFilePath: string);
+var
+  AFileStream : TFileStream;
+  TypeSize : Integer;
+  FileSize : Integer;
+begin
+  AFileStream := TFileStream.Create(AFilePath,fmOpenRead);
+  try
+    AFileStream.Read(TypeSize,SizeOf(Integer));
+    // to do
+  finally
+   AFileStream.Free;
+  end;
 end;
 
 destructor TDynamicArray<T>.Destroy;

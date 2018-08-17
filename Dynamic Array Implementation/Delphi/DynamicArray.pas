@@ -15,6 +15,7 @@ interface
 
 uses
   Winapi.Windows,
+  System.Classes,
   System.SysUtils;
 
 
@@ -33,6 +34,8 @@ type
   public
     constructor Create(ALength: NativeInt);
     destructor Destroy();
+  public
+    procedure Serialize(const AFilePath:string);
   public
     property RangeChecking: Boolean read FRangeChecking write FRangeChecking;
     property MemorySize: NativeInt read FSize;
@@ -89,6 +92,22 @@ begin
      raise Exception.Create(Format(IndexOutOfRangeException,[Index]));
   Result := SizeOf(T) * Index;
 end;
+
+procedure TDynamicArray<T>.Serialize(const AFilePath: string);
+var
+  AFileStream : TFileStream;
+  TypeSize : Integer;
+begin
+ AFileStream := TFileStream.Create(AFilePath,fmCreate);
+ try
+   TypeSize := SizeOf(T);
+   AFileStream.Write(TypeSize,SizeOf(Integer)); //  first 4 byte is size of data type.
+   AFileStream.WriteBuffer(FMemBlock,FSize);
+ finally
+  AFileStream.Free;
+ end;
+end;
+
 
 
 end.

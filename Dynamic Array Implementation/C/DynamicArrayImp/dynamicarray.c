@@ -11,13 +11,13 @@ int Offset(int index) {
 
 void SetArrayElement(PArray anArray, int index, int value) {
 	// check out of range
-	int* p = (anArray + Offset(index));
+	PArray p = (anArray + Offset(index));
 	*p = value;
 }
 
 int GetArrayElement(PArray anArray, int index) {
 	// check out of range
-	int* p = (anArray + Offset(index));
+	PArray p = (anArray + Offset(index));
 	return *p;
 }
 

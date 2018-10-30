@@ -1,3 +1,3 @@
-The Byte Code
+Debugger
 ===========
 ![ScreenShot](tests/dbg.gif)

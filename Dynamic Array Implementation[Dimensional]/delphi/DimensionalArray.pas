@@ -18,6 +18,8 @@ uses
   System.Classes,
   System.SysUtils;
 
+const IndexOutOfRangeException = 'IndexOutOfRangeException at %d';
+
 type
 
   TDimensionalArray<T> = class
@@ -36,6 +38,8 @@ type
     constructor Create(AColCount, ARowCount: NativeInt); overload;
     destructor Destroy();
   public
+    property ColCount: NativeInt read FColCount;
+    property RowCount: NativeInt read FRowCount;
     property Element[AColIndex, ARowIndex: NativeInt]: T read GetElement write SetElement; default;
   end;
 
@@ -44,7 +48,9 @@ implementation
 { TDimensionalArray<T> }
 constructor TDimensionalArray<T>.Create(AColCount, ARowCount: NativeInt);
 begin
-  GetMem(FBaseAdress, ARowCount * SizeOf(T));
+  FColCount := AColCount;
+  FRowCount := ARowCount;
+  GetMem(FBaseAdress,  SizeOf(T) * (FColCount * FRowCount));
 end;
 
 destructor TDimensionalArray<T>.Destroy;
@@ -55,6 +61,12 @@ end;
 function TDimensionalArray<T>.Offset(AColIndex, ARowIndex: NativeInt)
   : NativeInt;
 begin
+  if (AColIndex < 0) or (AColIndex > FColCount-1 ) then
+     raise Exception.Create(Format(IndexOutOfRangeException,[AColIndex]));
+
+  if (ARowIndex < 0) or (ARowIndex > FRowCount-1 ) then
+     raise Exception.Create(Format(IndexOutOfRangeException,[ARowIndex]));
+
   Result := (AColIndex * FRowCount + ARowIndex) * SizeOf(T);
 end;
 

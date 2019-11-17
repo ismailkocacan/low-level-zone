@@ -16,17 +16,27 @@ program Project1;
 
 uses
   System.SysUtils,
+  Vcl.Dialogs,
   DimensionalArray in 'DimensionalArray.pas';
 
 var
   AValue: NativeInt;
+  ColIndex,RowIndex : NativeInt;
   ATwoDimensionArray: TDimensionalArray<NativeInt>;
 
 begin
   ATwoDimensionArray := TDimensionalArray<NativeInt>.Create(2, 2);
   try
     ATwoDimensionArray[0, 0] := 31;
-    AValue := ATwoDimensionArray[0, 0];
+    ATwoDimensionArray[1, 0] := 32;
+    ATwoDimensionArray[0, 1] := 33;
+    ATwoDimensionArray[1, 1] := 34;
+
+    //test
+    for ColIndex := 0 to Pred(ATwoDimensionArray.ColCount) do
+      for RowIndex := 0 to Pred(ATwoDimensionArray.RowCount) do
+        ShowMessage(ATwoDimensionArray[ColIndex, RowIndex].ToString());
+
   finally
     ATwoDimensionArray.Free;
   end;

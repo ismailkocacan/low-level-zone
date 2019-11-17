@@ -44,7 +44,7 @@ implementation
 { TDimensionalArray<T> }
 constructor TDimensionalArray<T>.Create(AColCount, ARowCount: NativeInt);
 begin
-  GetMem(FBaseAdress, SizeOf(T));
+  GetMem(FBaseAdress, ARowCount * SizeOf(T));
 end;
 
 destructor TDimensionalArray<T>.Destroy;

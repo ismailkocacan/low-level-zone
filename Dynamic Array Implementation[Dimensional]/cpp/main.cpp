@@ -56,16 +56,15 @@ int main(){
     myTwoDimensionArray.SetElement(0,1,33); // 1. kolon, 2. satır
     myTwoDimensionArray.SetElement(1,1,34); // 2. kolon, 2. satır
     
-    int32_t value;
-    value = myTwoDimensionArray.GetElement(0,0); 
-    std::cout << "1. kolon, 1. satır Değeri: " << value << std::endl;
-    value = myTwoDimensionArray.GetElement(1,0); 
-    std::cout << "2. kolon, 1. satır Değeri: " << value << std::endl;
+    int32_t value_0_0 = myTwoDimensionArray.GetElement(0,0); 
+    std::cout << "1. kolon, 1. satır Değeri: " << value_0_0 << std::endl;
+    int32_t value_1_0 = myTwoDimensionArray.GetElement(1,0); 
+    std::cout << "2. kolon, 1. satır Değeri: " << value_1_0 << std::endl;
 
-    value = myTwoDimensionArray.GetElement(0,1); 
-    std::cout << "1. kolon, 2. satır Değeri: " << value << std::endl;
-    value = myTwoDimensionArray.GetElement(1,1);  
-    std::cout << "2. kolon, 2. satır Değeri: " << value << std::endl;
+    int32_t value_0_1 = myTwoDimensionArray.GetElement(0,1); 
+    std::cout << "1. kolon, 2. satır Değeri: " << value_0_1 << std::endl;
+    int32_t value_1_1 = myTwoDimensionArray.GetElement(1,1);  
+    std::cout << "2. kolon, 2. satır Değeri: " << value_1_1 << std::endl;
 
     system("pause");
     return EXIT_SUCCESS;

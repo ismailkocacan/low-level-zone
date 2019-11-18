@@ -32,7 +32,7 @@ unsafe class DimensionalArray<T> where T : unmanaged
         return (colIndex * rowCount + rowIndex) * Marshal.SizeOf(typeof(T));
     }
 
-    IntPtr CalculateElementAdress(int colIndex, int rowIndex)
+    private IntPtr CalculateElementAdress(int colIndex, int rowIndex)
     {
         IntPtr elementAdress = IntPtr.Add(baseAdress, Offset(colIndex, rowIndex));
         return elementAdress;

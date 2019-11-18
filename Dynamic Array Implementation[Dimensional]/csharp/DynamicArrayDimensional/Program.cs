@@ -7,6 +7,8 @@
   Composite Data Types and Memory Objects
   Type variable[Col_Size][Row_Size]
   Element_Adress = Base_Adress + (Col_Index * Row_Size + Row_Index) * Element_Size
+
+  https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-7.3/blittable (Unmanaged type constraint)
 */
 
 

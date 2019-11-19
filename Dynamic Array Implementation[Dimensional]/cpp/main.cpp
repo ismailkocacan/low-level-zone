@@ -21,29 +21,46 @@ private:
    int32_t fRowCount;
 private:
    int32_t Offset(int32_t colIndex, int32_t rowIndex){
- 		 return (colIndex * fRowCount + rowIndex) * sizeof(Type);
+ 	   return (colIndex * fRowCount + rowIndex) * sizeof(Type);
    } 
+
    Type* CalculateElementAdress(int32_t colIndex, int32_t rowIndex){
      return fBaseAdress + Offset(colIndex,rowIndex);
+   }
+
+   size_t CalculateMemorySize(int32_t colCount,int32_t rowCount){
+     return sizeof(Type) * (colCount * rowCount);
+   }
+
+   void MemoryAllocate(int32_t colCount,int32_t rowCount){
+     fBaseAdress = (Type*)malloc(CalculateMemorySize(fColCount,fRowCount));
+   }
+
+   void MemoryFree(){
+     free(fBaseAdress);   
    }
 public:
   DimensionalArray(int32_t colCount,int32_t rowCount):
     fColCount(colCount),
     fRowCount(rowCount){
-    fBaseAdress = (Type*)malloc(sizeof(Type) * (fColCount * fRowCount));
+    MemoryAllocate(colCount,rowCount);
   }
   ~DimensionalArray() {
-    free(fBaseAdress);   
+    MemoryFree();
   }      
 public:
   Type GetElement(int32_t colIndex, int32_t rowIndex){
       Type* elementAdress = CalculateElementAdress(colIndex,rowIndex);
       return *elementAdress;
   }
-
+  
   void SetElement(int32_t colIndex, int32_t rowIndex, Type value){
       Type* elementAdress = CalculateElementAdress(colIndex,rowIndex);
       *elementAdress = value;
+  }
+
+  void ReSize(int32_t colCount,int32_t rowCount){
+     fBaseAdress = (Type*)realloc(fBaseAdress,CalculateMemorySize(colCount,rowCount));
   }
 
   int32_t GetColCount(){

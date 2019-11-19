@@ -29,14 +29,20 @@ type
     FColCount: NativeInt;
     FRowCount: NativeInt;
     FBaseAdress: PT;
+    FPtrWrapper : TPtrWrapper;
   strict private
     function Offset(AColIndex, ARowIndex: NativeInt): NativeInt;
     function GetElement(AColIndex, ARowIndex: NativeInt): T;
     procedure SetElement(AColIndex, ARowIndex: NativeInt; const Value: T);
     function CalculateElementAdress(AColIndex, ARowIndex: NativeInt): PT;
+    function CalculateMemorySize(AColCount, ARowCount: NativeInt):NativeInt;
+    procedure MemoryAllocate(AColCount, ARowCount: NativeInt);
+    procedure MemoryFree();
   public
     constructor Create(AColCount, ARowCount: NativeInt);
     destructor Destroy();
+  public
+    procedure ReSize(AColCount, ARowCount: NativeInt);
   public
     property ColCount: NativeInt read FColCount;
     property RowCount: NativeInt read FRowCount;
@@ -50,13 +56,13 @@ constructor TDimensionalArray<T>.Create(AColCount, ARowCount: NativeInt);
 begin
   FColCount := AColCount;
   FRowCount := ARowCount;
-  GetMem(FBaseAdress,  SizeOf(T) * (FColCount * FRowCount));
+  MemoryAllocate(AColCount, ARowCount);
   inherited Create;
 end;
 
 destructor TDimensionalArray<T>.Destroy;
 begin
-  FreeMem(FBaseAdress);
+  TMarshal.FreeMem(FPtrWrapper);
   inherited Destroy;
 end;
 
@@ -72,10 +78,34 @@ begin
   Result := (AColIndex * FRowCount + ARowIndex) * SizeOf(T);
 end;
 
+procedure TDimensionalArray<T>.ReSize(AColCount, ARowCount: NativeInt);
+begin
+  MemoryFree();
+  FPtrWrapper := TMarshal.ReallocMem(FPtrWrapper,CalculateMemorySize(AColCount, ARowCount));
+  FBaseAdress := FPtrWrapper.ToPointer;
+end;
+
+procedure TDimensionalArray<T>.MemoryAllocate(AColCount, ARowCount: NativeInt);
+begin
+  FPtrWrapper := TMarshal.AllocMem(CalculateMemorySize(AColCount, ARowCount));
+  FBaseAdress := FPtrWrapper.ToPointer;
+end;
+
+procedure TDimensionalArray<T>.MemoryFree;
+begin
+  TMarshal.FreeMem(FPtrWrapper);
+end;
+
 function TDimensionalArray<T>.CalculateElementAdress(AColIndex,
   ARowIndex: NativeInt): PT;
 begin
   Result := PT(PByte(FBaseAdress) + Offset(AColIndex, ARowIndex));
+end;
+
+function TDimensionalArray<T>.CalculateMemorySize(AColCount,
+ ARowCount: NativeInt): NativeInt;
+begin
+  Result := SizeOf(T) * (FColCount * FRowCount);
 end;
 
 function TDimensionalArray<T>.GetElement(AColIndex, ARowIndex: NativeInt): T;

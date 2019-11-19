@@ -26,7 +26,7 @@ unsafe class DimensionalArray<T> where T : unmanaged
     {
         this.colCount = colCount;
         this.rowCount = rowCount;
-        baseAdress = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(T)) * (colCount * rowCount));
+        MemoryAllocate(colCount, rowCount);
     }
 
     private int Offset(int colIndex, int rowIndex)
@@ -38,6 +38,34 @@ unsafe class DimensionalArray<T> where T : unmanaged
     {
         IntPtr elementAdress = IntPtr.Add(baseAdress, Offset(colIndex, rowIndex));
         return elementAdress;
+    }
+
+    private int CalculateMemorySize(int colCount, int rowCount)
+    {
+        return Marshal.SizeOf(typeof(T)) * (colCount * rowCount);
+    }
+
+    private void MemoryAllocate(int colCount, int rowCount)
+    {
+        baseAdress = Marshal.AllocHGlobal(CalculateMemorySize(colCount, rowCount));
+    }
+
+    private void ReSize(int colCount, int rowCount)
+    {
+        /*
+         cb:IntPtr
+         The new size of the allocated block. 
+         This is not a pointer; it is the byte count you are requesting, cast to type IntPtr. 
+         If you pass a pointer, it is treated as a size.
+         https://docs.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.marshal.reallochglobal?view=netframework-4.8
+         */
+        MemoryFree();
+        baseAdress = Marshal.ReAllocHGlobal(baseAdress, (IntPtr)CalculateMemorySize(colCount, rowCount));
+    }
+
+    private void MemoryFree()
+    {
+        Marshal.FreeHGlobal(baseAdress);
     }
 
     public int ColCount { get { return colCount; } }
@@ -61,7 +89,7 @@ unsafe class DimensionalArray<T> where T : unmanaged
 
     ~DimensionalArray()
     {
-        Marshal.FreeHGlobal(baseAdress);
+        MemoryFree();
     }
 }
 

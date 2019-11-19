@@ -35,7 +35,7 @@ type
     procedure SetElement(AColIndex, ARowIndex: NativeInt; const Value: T);
     function CalculateElementAdress(AColIndex, ARowIndex: NativeInt): PT;
   public
-    constructor Create(AColCount, ARowCount: NativeInt); overload;
+    constructor Create(AColCount, ARowCount: NativeInt);
     destructor Destroy();
   public
     property ColCount: NativeInt read FColCount;
@@ -51,11 +51,13 @@ begin
   FColCount := AColCount;
   FRowCount := ARowCount;
   GetMem(FBaseAdress,  SizeOf(T) * (FColCount * FRowCount));
+  inherited Create;
 end;
 
 destructor TDimensionalArray<T>.Destroy;
 begin
   FreeMem(FBaseAdress);
+  inherited Destroy;
 end;
 
 function TDimensionalArray<T>.Offset(AColIndex, ARowIndex: NativeInt)

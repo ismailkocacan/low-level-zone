@@ -36,7 +36,8 @@ type
     procedure SetElement(AColIndex, ARowIndex: NativeInt; const Value: T);
     function CalculateElementAdress(AColIndex, ARowIndex: NativeInt): PT;
     function CalculateMemorySize(AColCount, ARowCount: NativeInt):NativeInt;
-    procedure MemoryAllocate(AColCount, ARowCount: NativeInt);
+    procedure SetColAndRowCount(AColCount, ARowCount: NativeInt);
+    procedure MemoryAllocate();
     procedure MemoryFree();
   public
     constructor Create(AColCount, ARowCount: NativeInt);
@@ -54,9 +55,8 @@ implementation
 { TDimensionalArray<T> }
 constructor TDimensionalArray<T>.Create(AColCount, ARowCount: NativeInt);
 begin
-  FColCount := AColCount;
-  FRowCount := ARowCount;
-  MemoryAllocate(AColCount, ARowCount);
+  SetColAndRowCount(AColCount,ARowCount);
+  MemoryAllocate();
   inherited Create;
 end;
 
@@ -81,13 +81,20 @@ end;
 procedure TDimensionalArray<T>.ReSize(AColCount, ARowCount: NativeInt);
 begin
   MemoryFree();
+  SetColAndRowCount(AColCount,ARowCount);
   FPtrWrapper := TMarshal.ReallocMem(FPtrWrapper,CalculateMemorySize(AColCount, ARowCount));
   FBaseAdress := FPtrWrapper.ToPointer;
 end;
 
-procedure TDimensionalArray<T>.MemoryAllocate(AColCount, ARowCount: NativeInt);
+procedure TDimensionalArray<T>.SetColAndRowCount(AColCount, ARowCount: NativeInt);
 begin
-  FPtrWrapper := TMarshal.AllocMem(CalculateMemorySize(AColCount, ARowCount));
+  FColCount := AColCount;
+  FRowCount := ARowCount;
+end;
+
+procedure TDimensionalArray<T>.MemoryAllocate();
+begin
+  FPtrWrapper := TMarshal.AllocMem(CalculateMemorySize(FColCount, FRowCount));
   FBaseAdress := FPtrWrapper.ToPointer;
 end;
 
@@ -105,7 +112,7 @@ end;
 function TDimensionalArray<T>.CalculateMemorySize(AColCount,
  ARowCount: NativeInt): NativeInt;
 begin
-  Result := SizeOf(T) * (FColCount * FRowCount);
+  Result := SizeOf(T) * (AColCount * ARowCount);
 end;
 
 function TDimensionalArray<T>.GetElement(AColIndex, ARowIndex: NativeInt): T;

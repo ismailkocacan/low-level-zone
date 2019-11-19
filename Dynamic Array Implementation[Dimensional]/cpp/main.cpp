@@ -31,8 +31,13 @@ private:
    size_t CalculateMemorySize(int32_t colCount,int32_t rowCount){
      return sizeof(Type) * (colCount * rowCount);
    }
+   
+   void SetColAndRowCount(int32_t colCount,int32_t rowCount){
+      fColCount = colCount;
+      fRowCount = rowCount;
+   }
 
-   void MemoryAllocate(int32_t colCount,int32_t rowCount){
+   void MemoryAllocate(){
      fBaseAdress = (Type*)malloc(CalculateMemorySize(fColCount,fRowCount));
    }
 
@@ -43,7 +48,7 @@ public:
   DimensionalArray(int32_t colCount,int32_t rowCount):
     fColCount(colCount),
     fRowCount(rowCount){
-    MemoryAllocate(colCount,rowCount);
+    MemoryAllocate();
   }
   ~DimensionalArray() {
     MemoryFree();
@@ -60,6 +65,8 @@ public:
   }
 
   void ReSize(int32_t colCount,int32_t rowCount){
+     MemoryFree();
+     SetColAndRowCount(colCount,rowCount);
      fBaseAdress = (Type*)realloc(fBaseAdress,CalculateMemorySize(colCount,rowCount));
   }
 

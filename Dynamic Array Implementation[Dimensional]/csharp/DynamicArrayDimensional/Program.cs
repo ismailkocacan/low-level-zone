@@ -24,9 +24,8 @@ unsafe class DimensionalArray<T> where T : unmanaged
 
     public DimensionalArray(int colCount, int rowCount)
     {
-        this.colCount = colCount;
-        this.rowCount = rowCount;
-        MemoryAllocate(colCount, rowCount);
+        SetColAndRowCount(colCount, rowCount);
+        MemoryAllocate();
     }
 
     private int Offset(int colIndex, int rowIndex)
@@ -45,7 +44,13 @@ unsafe class DimensionalArray<T> where T : unmanaged
         return Marshal.SizeOf(typeof(T)) * (colCount * rowCount);
     }
 
-    private void MemoryAllocate(int colCount, int rowCount)
+    private void SetColAndRowCount(int colCount, int rowCount)
+    {
+        this.colCount = colCount;
+        this.rowCount = rowCount;
+    }
+
+    private void MemoryAllocate()
     {
         baseAdress = Marshal.AllocHGlobal(CalculateMemorySize(colCount, rowCount));
     }
@@ -60,6 +65,7 @@ unsafe class DimensionalArray<T> where T : unmanaged
          https://docs.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.marshal.reallochglobal?view=netframework-4.8
          */
         MemoryFree();
+        SetColAndRowCount(colCount, rowCount);
         baseAdress = Marshal.ReAllocHGlobal(baseAdress, (IntPtr)CalculateMemorySize(colCount, rowCount));
     }
 

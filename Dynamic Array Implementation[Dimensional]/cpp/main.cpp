@@ -9,7 +9,7 @@
   Type variable[Col_Size][Row_Size]
   Element_Adress = Base_Adress + (Col_Index * Row_Size + Row_Index) * Element_Size
 */
-
+#include <cstdint>
 #include <iostream>
 
 template <class Type>

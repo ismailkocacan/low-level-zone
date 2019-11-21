@@ -1,13 +1,12 @@
 ﻿/*
   Author   : isocan
-  Purpose  : How to implement Three-dimensional dynamic array using pointers.
-  DateTime : 21.11.2019
+  Purpose  : How to implement dimensional dynamic array using pointers.
+  DateTime : 18.11.2019
 
   Write Great Code: Volume 1: Understanding the Machine
   Composite Data Types and Memory Objects
-
-  Type variable[Depth_Size][Col_Size][Row_Size];
-  Element_Adress = Base_Adress + ( (Depth_Index * Col_Size + Col_Index) * Row_Size + Row_Index) * Element_Size
+  Type variable[Col_Size][Row_Size]
+  Element_Adress = Base_Adress + (Col_Index * Row_Size + Row_Index) * Element_Size
 
   https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-7.3/blittable (Unmanaged type constraint)
 */
@@ -17,61 +16,46 @@ using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-unsafe class ThreeDimensionalArray<T> where T : unmanaged
+unsafe class DimensionalArray<T> where T : unmanaged
 {
-    private const string IndexOutOfRangeException = "IndexOutOfRangeException at %s %d";
-
-    private int depthSize;
     private int colCount;
     private int rowCount;
-    private int memorySize;
     private IntPtr baseAdress;
 
-    public ThreeDimensionalArray(int depthSize, int colCount, int rowCount)
+    public DimensionalArray(int colCount, int rowCount)
     {
-        SetDepthAndColAndRowCount(depthSize, colCount, rowCount);
+        SetColAndRowCount(colCount, rowCount);
         MemoryAllocate();
     }
 
-    private int Offset(int depthIndex, int colIndex, int rowIndex)
+    private int Offset(int colIndex, int rowIndex)
     {
-        if ((depthIndex < 0) || (colIndex > depthSize - 1))
-            throw new Exception(string.Format(IndexOutOfRangeException, "depthIndex", ADepthIndex));
-
-        if ((colIndex < 0) || (colIndex > colCount - 1)) 
-            throw new Exception(string.Format(IndexOutOfRangeException, "colIndex", colIndex));
-
-        if ((rowIndex < 0) || (rowIndex > rowCount-1))
-            throw new Exception(string.Format(IndexOutOfRangeException, "rowIndex", rowIndex));
-
-        return ((depthIndex * colCount + colIndex) * rowCount + rowIndex) * Marshal.SizeOf(typeof(T));
+        return (colIndex * rowCount + rowIndex) * Marshal.SizeOf(typeof(T));
     }
 
-    private IntPtr CalculateElementAdress(int depthIndex, int colIndex, int rowIndex)
+    private IntPtr CalculateElementAdress(int colIndex, int rowIndex)
     {
-        IntPtr elementAdress = IntPtr.Add(baseAdress, Offset(depthIndex, colIndex, rowIndex));
+        IntPtr elementAdress = IntPtr.Add(baseAdress, Offset(colIndex, rowIndex));
         return elementAdress;
     }
 
-    private int CalculateMemorySize(int depthSize, int colCount, int rowCount)
+    private int CalculateMemorySize(int colCount, int rowCount)
     {
-        return Marshal.SizeOf(typeof(T)) * depthSize * (colCount * rowCount);
+        return Marshal.SizeOf(typeof(T)) * (colCount * rowCount);
     }
 
-    private void SetDepthAndColAndRowCount(int depthSize, int colCount, int rowCount)
+    private void SetColAndRowCount(int colCount, int rowCount)
     {
-        this.depthSize = depthSize;
         this.colCount = colCount;
         this.rowCount = rowCount;
     }
 
     private void MemoryAllocate()
     {
-        memorySize = CalculateMemorySize(depthSize, colCount, rowCount);
-        baseAdress = Marshal.AllocHGlobal(memorySize);
+        baseAdress = Marshal.AllocHGlobal(CalculateMemorySize(colCount, rowCount));
     }
 
-    private void ReSize(int depthSize, int colCount, int rowCount)
+    private void ReSize(int colCount, int rowCount)
     {
         /*
          cb:IntPtr
@@ -81,9 +65,8 @@ unsafe class ThreeDimensionalArray<T> where T : unmanaged
          https://docs.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.marshal.reallochglobal?view=netframework-4.8
          */
         MemoryFree();
-        SetDepthAndColAndRowCount(depthSize, colCount, rowCount);
-        memorySize = CalculateMemorySize(depthSize, colCount, rowCount);
-        baseAdress = Marshal.ReAllocHGlobal(baseAdress, (IntPtr)memorySize);
+        SetColAndRowCount(colCount, rowCount);
+        baseAdress = Marshal.ReAllocHGlobal(baseAdress, (IntPtr)CalculateMemorySize(colCount, rowCount));
     }
 
     private void MemoryFree()
@@ -91,28 +74,26 @@ unsafe class ThreeDimensionalArray<T> where T : unmanaged
         Marshal.FreeHGlobal(baseAdress);
     }
 
-    public int DepthSize { get { return depthSize; } }
     public int ColCount { get { return colCount; } }
     public int RowCount { get { return rowCount; } }
-    public int MemorySize { get { return memorySize; } }
 
-    public T this[int depthIndex, int colIndex, int rowIndex]
+    public T this[int colIndex, int rowIndex]
     {
         get
         {
-            void* elementAdress = CalculateElementAdress(depthIndex, colIndex, rowIndex).ToPointer();
+            void* elementAdress = CalculateElementAdress(colIndex, rowIndex).ToPointer();
             T* tp = (T*)elementAdress;
             return *tp;
         }
         set
         {
-            void* elementAdress = CalculateElementAdress(depthIndex, colIndex, rowIndex).ToPointer();
+            void* elementAdress = CalculateElementAdress(colIndex, rowIndex).ToPointer();
             T* tp = (T*)elementAdress;
             *tp = value;
         }
     }
 
-    ~ThreeDimensionalArray()
+    ~DimensionalArray()
     {
         MemoryFree();
     }
@@ -122,20 +103,20 @@ class Program
 {
     static void Main(string[] args)
     {
-        ThreeDimensionalArray<int> anArray = new ThreeDimensionalArray<int>(2, 2, 2);
-        //anArray.MemorySize;
+        DimensionalArray<int> myTwoDimensionArray = new DimensionalArray<int>(2, 2);
+        myTwoDimensionArray[0, 0] = 31;
+        myTwoDimensionArray[1, 0] = 32;
+        myTwoDimensionArray[0, 1] = 33;
+        myTwoDimensionArray[1, 1] = 34;
 
-        // set values
-        for (int depthIndex = 0; depthIndex < anArray.DepthSize; depthIndex++)
-            for (int colIndex = 0; colIndex < anArray.ColCount; colIndex++)
-                for (int rowIndex = 0; rowIndex < anArray.RowCount; rowIndex++)
-                    anArray[depthIndex, colIndex, rowIndex] = depthIndex + colIndex + rowIndex;
-
-        // access elements
-        for (int depthIndex = 0; depthIndex < anArray.DepthSize; depthIndex++)
-            for (int colIndex = 0; colIndex < anArray.ColCount; colIndex++)
-                for (int rowIndex = 0; rowIndex < anArray.RowCount; rowIndex++)
-                    int value = anArray[depthIndex, colIndex, rowIndex];
-
+        // test
+        for (int colIndex = 0; colIndex < myTwoDimensionArray.ColCount; colIndex++)
+        {
+            for (int rowIndex = 0; rowIndex < myTwoDimensionArray.RowCount; rowIndex++)
+            {
+                int value = myTwoDimensionArray[colIndex, rowIndex];
+                MessageBox.Show(value.ToString());
+            }
+        }
     }
 }

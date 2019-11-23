@@ -10,6 +10,9 @@
   Element_Adress = Base_Adress + (Col_Index * Row_Size + Row_Index) * Element_Size
 */
 #include <cstdint>
+#include <string> 
+#include <stdexcept>
+#include <sstream>
 #include <iostream>
 
 template <class Type>
@@ -19,8 +22,30 @@ private:
    Type* fBaseAdress;  
    int32_t fColCount;
    int32_t fRowCount;
+   int32_t fMemorySize; 
 private:
+   std::string ToString(int32_t value){
+      std::string outString;
+      std::stringstream ss;
+      ss << value;
+      outString = ss.str();
+      return outString;
+   }
+
+   std::string GetMessage(std::string indexName,int32_t index){
+      return std::string(IndexOutOfRangeException + indexName + "["+ ToString(index)+"]");
+   }
+
+   void RangeCheck(int32_t colIndex, int32_t rowIndex){
+     if ((colIndex < 0) || (colIndex > fColCount - 1))
+       throw std::out_of_range(GetMessage("colIndex",colIndex).c_str());
+ 
+     if ((rowIndex < 0) || (rowIndex > fRowCount - 1))
+       throw std::out_of_range(GetMessage("rowIndex",rowIndex).c_str());
+   }
+
    int32_t Offset(int32_t colIndex, int32_t rowIndex){
+     RangeCheck(colIndex,rowIndex);
  	   return (colIndex * fRowCount + rowIndex) * sizeof(Type);
    } 
 
@@ -28,8 +53,8 @@ private:
      return fBaseAdress + Offset(colIndex,rowIndex);
    }
 
-   size_t CalculateMemorySize(int32_t colCount,int32_t rowCount){
-     return sizeof(Type) * (colCount * rowCount);
+   void CalculateMemorySize(){
+     fMemorySize =  sizeof(Type) * (fColCount * fRowCount);
    }
    
    void SetColAndRowCount(int32_t colCount,int32_t rowCount){
@@ -38,7 +63,8 @@ private:
    }
 
    void MemoryAllocate(){
-     fBaseAdress = (Type*)malloc(CalculateMemorySize(fColCount,fRowCount));
+     CalculateMemorySize();
+     fBaseAdress = (Type*)malloc(fMemorySize);
    }
 
    void MemoryFree(){
@@ -67,7 +93,8 @@ public:
   void ReSize(int32_t colCount,int32_t rowCount){
      MemoryFree();
      SetColAndRowCount(colCount,rowCount);
-     fBaseAdress = (Type*)realloc(fBaseAdress,CalculateMemorySize(colCount,rowCount));
+     fMemorySize = CalculateMemorySize();
+     fBaseAdress = (Type*)realloc(fBaseAdress,fMemorySize);
   }
 
   int32_t GetColCount(){
@@ -81,33 +108,38 @@ public:
 
 
 int main(){    
-    DimensionalArray<int32_t> myTwoDimensionArray(2,2); // 2 sütun, 2 satır
-    myTwoDimensionArray.SetElement(0,0,31); // 1. kolon, 1. satır.
-    myTwoDimensionArray.SetElement(1,0,32); // 2. kolon, 1. satır
+    try{
+        DimensionalArray<int32_t> myTwoDimensionArray(2,2); // 2 sütun, 2 satır
+        myTwoDimensionArray.SetElement(0,0,31); // 1. kolon, 1. satır.
+        myTwoDimensionArray.SetElement(1,0,32); // 2. kolon, 1. satır
 
-    myTwoDimensionArray.SetElement(0,1,33); // 1. kolon, 2. satır
-    myTwoDimensionArray.SetElement(1,1,34); // 2. kolon, 2. satır
-    
-    /*
-    int32_t value_0_0 = myTwoDimensionArray.GetElement(0,0); 
-    std::cout << "1. kolon, 1. satır Değeri: " << value_0_0 << std::endl;
-    int32_t value_1_0 = myTwoDimensionArray.GetElement(1,0); 
-    std::cout << "2. kolon, 1. satır Değeri: " << value_1_0 << std::endl;
+        myTwoDimensionArray.SetElement(0,1,33); // 1. kolon, 2. satır
+        myTwoDimensionArray.SetElement(1,1,34); // 2. kolon, 2. satır
+        
+        /*
+        int32_t value_0_0 = myTwoDimensionArray.GetElement(0,0); 
+        std::cout << "1. kolon, 1. satır Değeri: " << value_0_0 << std::endl;
+        int32_t value_1_0 = myTwoDimensionArray.GetElement(1,0); 
+        std::cout << "2. kolon, 1. satır Değeri: " << value_1_0 << std::endl;
 
-    int32_t value_0_1 = myTwoDimensionArray.GetElement(0,1); 
-    std::cout << "1. kolon, 2. satır Değeri: " << value_0_1 << std::endl;
-    int32_t value_1_1 = myTwoDimensionArray.GetElement(1,1);  
-    std::cout << "2. kolon, 2. satır Değeri: " << value_1_1 << std::endl;
-   */
+        int32_t value_0_1 = myTwoDimensionArray.GetElement(0,1); 
+        std::cout << "1. kolon, 2. satır Değeri: " << value_0_1 << std::endl;
+        int32_t value_1_1 = myTwoDimensionArray.GetElement(1,1);  
+        std::cout << "2. kolon, 2. satır Değeri: " << value_1_1 << std::endl;
+      */
 
-    // test
-    for (size_t colIndex = 0; colIndex < myTwoDimensionArray.GetColCount(); colIndex++){
-      for (size_t rowIndex = 0; rowIndex < myTwoDimensionArray.GetRowCount(); rowIndex++){
-          int32_t value = myTwoDimensionArray.GetElement(colIndex,rowIndex);
-          std::cout << "["<< colIndex << "," << rowIndex <<"]" << value << std::endl;
-      }      
+        // test
+        for (size_t colIndex = 0; colIndex < myTwoDimensionArray.GetColCount(); colIndex++){
+          for (size_t rowIndex = 0; rowIndex < myTwoDimensionArray.GetRowCount(); rowIndex++){
+              int32_t value = myTwoDimensionArray.GetElement(colIndex,rowIndex);
+              std::cout << "["<< colIndex << "," << rowIndex <<"]" << value << std::endl;
+          }      
+        }
     }
-   
+    catch(const std::exception& e){
+      std::cerr << e.what() << '\n';
+    }
+    
     system("pause");
     return EXIT_SUCCESS;
 }

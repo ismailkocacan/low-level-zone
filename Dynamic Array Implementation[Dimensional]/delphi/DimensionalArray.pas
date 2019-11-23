@@ -18,24 +18,26 @@ uses
   System.Classes,
   System.SysUtils;
 
-const IndexOutOfRangeException = 'IndexOutOfRangeException at %d';
 
 type
 
   TDimensionalArray<T> = class
+   const IndexOutOfRangeException = 'IndexOutOfRangeException at %d';
   type
     PT = ^T;
   strict private
     FColCount: NativeInt;
     FRowCount: NativeInt;
+    FMemorySize : NativeInt;
     FBaseAdress: PT;
     FPtrWrapper : TPtrWrapper;
   strict private
+    procedure RangeCheck(AColIndex, ARowIndex: NativeInt);
     function Offset(AColIndex, ARowIndex: NativeInt): NativeInt;
     function GetElement(AColIndex, ARowIndex: NativeInt): T;
     procedure SetElement(AColIndex, ARowIndex: NativeInt; const Value: T);
     function CalculateElementAdress(AColIndex, ARowIndex: NativeInt): PT;
-    function CalculateMemorySize(AColCount, ARowCount: NativeInt):NativeInt;
+    procedure CalculateMemorySize();
     procedure SetColAndRowCount(AColCount, ARowCount: NativeInt);
     procedure MemoryAllocate();
     procedure MemoryFree();
@@ -66,15 +68,20 @@ begin
   inherited Destroy;
 end;
 
-function TDimensionalArray<T>.Offset(AColIndex, ARowIndex: NativeInt)
-  : NativeInt;
+
+procedure TDimensionalArray<T>.RangeCheck(AColIndex, ARowIndex: NativeInt);
 begin
   if (AColIndex < 0) or (AColIndex > FColCount-1 ) then
      raise Exception.Create(Format(IndexOutOfRangeException,[AColIndex]));
 
   if (ARowIndex < 0) or (ARowIndex > FRowCount-1 ) then
      raise Exception.Create(Format(IndexOutOfRangeException,[ARowIndex]));
+end;
 
+function TDimensionalArray<T>.Offset(AColIndex, ARowIndex: NativeInt)
+  : NativeInt;
+begin
+  RangeCheck(AColIndex,ARowIndex);
   Result := (AColIndex * FRowCount + ARowIndex) * SizeOf(T);
 end;
 
@@ -82,7 +89,8 @@ procedure TDimensionalArray<T>.ReSize(AColCount, ARowCount: NativeInt);
 begin
   MemoryFree();
   SetColAndRowCount(AColCount,ARowCount);
-  FPtrWrapper := TMarshal.ReallocMem(FPtrWrapper,CalculateMemorySize(AColCount, ARowCount));
+  CalculateMemorySize();
+  FPtrWrapper := TMarshal.ReallocMem(FPtrWrapper,FMemorySize);
   FBaseAdress := FPtrWrapper.ToPointer;
 end;
 
@@ -94,7 +102,8 @@ end;
 
 procedure TDimensionalArray<T>.MemoryAllocate();
 begin
-  FPtrWrapper := TMarshal.AllocMem(CalculateMemorySize(FColCount, FRowCount));
+  CalculateMemorySize();
+  FPtrWrapper := TMarshal.AllocMem(FMemorySize);
   FBaseAdress := FPtrWrapper.ToPointer;
 end;
 
@@ -109,10 +118,9 @@ begin
   Result := PT(PByte(FBaseAdress) + Offset(AColIndex, ARowIndex));
 end;
 
-function TDimensionalArray<T>.CalculateMemorySize(AColCount,
- ARowCount: NativeInt): NativeInt;
+procedure TDimensionalArray<T>.CalculateMemorySize();
 begin
-  Result := SizeOf(T) * (AColCount * ARowCount);
+  FMemorySize := SizeOf(T) * (FColCount * FRowCount);
 end;
 
 function TDimensionalArray<T>.GetElement(AColIndex, ARowIndex: NativeInt): T;

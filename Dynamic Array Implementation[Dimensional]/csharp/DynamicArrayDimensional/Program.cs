@@ -20,6 +20,7 @@ unsafe class DimensionalArray<T> where T : unmanaged
 {
     private int colCount;
     private int rowCount;
+    private int memorySize;
     private IntPtr baseAdress;
 
     public DimensionalArray(int colCount, int rowCount)
@@ -39,9 +40,9 @@ unsafe class DimensionalArray<T> where T : unmanaged
         return elementAdress;
     }
 
-    private int CalculateMemorySize(int colCount, int rowCount)
+    private void CalculateMemorySize()
     {
-        return Marshal.SizeOf(typeof(T)) * (colCount * rowCount);
+        memorySize = Marshal.SizeOf(typeof(T)) * (colCount * rowCount);
     }
 
     private void SetColAndRowCount(int colCount, int rowCount)
@@ -52,7 +53,8 @@ unsafe class DimensionalArray<T> where T : unmanaged
 
     private void MemoryAllocate()
     {
-        baseAdress = Marshal.AllocHGlobal(CalculateMemorySize(colCount, rowCount));
+        CalculateMemorySize();
+        baseAdress = Marshal.AllocHGlobal(memorySize);
     }
 
     private void ReSize(int colCount, int rowCount)
@@ -66,7 +68,8 @@ unsafe class DimensionalArray<T> where T : unmanaged
          */
         MemoryFree();
         SetColAndRowCount(colCount, rowCount);
-        baseAdress = Marshal.ReAllocHGlobal(baseAdress, (IntPtr)CalculateMemorySize(colCount, rowCount));
+        CalculateMemorySize();
+        baseAdress = Marshal.ReAllocHGlobal(baseAdress, (IntPtr)memorySize);
     }
 
     private void MemoryFree()
@@ -77,19 +80,22 @@ unsafe class DimensionalArray<T> where T : unmanaged
     public int ColCount { get { return colCount; } }
     public int RowCount { get { return rowCount; } }
 
+    private T* GetElementAdress(int colIndex, int rowIndex)
+    {
+        void* unTypedElementAdress = CalculateElementAdress(colIndex, rowIndex).ToPointer();
+        T* typedElementAdress = (T*)unTypedElementAdress;
+        return typedElementAdress;
+    }
+
     public T this[int colIndex, int rowIndex]
     {
         get
         {
-            void* elementAdress = CalculateElementAdress(colIndex, rowIndex).ToPointer();
-            T* tp = (T*)elementAdress;
-            return *tp;
+            return *GetElementAdress(colIndex, rowIndex);
         }
         set
         {
-            void* elementAdress = CalculateElementAdress(colIndex, rowIndex).ToPointer();
-            T* tp = (T*)elementAdress;
-            *tp = value;
+            *GetElementAdress(colIndex, rowIndex) = value;
         }
     }
 

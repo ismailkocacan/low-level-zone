@@ -1,4 +1,3 @@
-
 /*
   Author   : isocan
   Purpose  : How to implement Three-dimensional dynamic array using pointers.
@@ -11,6 +10,9 @@
   Element_Adress = Base_Adress + ( (Depth_Index * Col_Size + Col_Index) * Row_Size + Row_Index) * Element_Size
 */
 #include <cstdint>
+#include <string> 
+#include <stdexcept>
+#include <sstream>
 #include <iostream>
 
 template <class Type>
@@ -21,8 +23,33 @@ private:
    int32_t fColCount;
    int32_t fRowCount;
    int32_t fDepthSize;
+   int32_t fMemorySize;
 private:
-   int32_t Offset(int32_t depthIndex, int32_t colIndex, int32_t rowIndex){ 	   
+   std::string ToString(int32_t value){
+      std::string outString;
+      std::stringstream ss;
+      ss << value;
+      outString = ss.str();
+      return outString;
+   }
+
+   std::string GetMessage(std::string indexName,int32_t index){
+      return std::string(IndexOutOfRangeException + indexName + "["+ ToString(index)+"]");
+   }
+
+   void RangeCheck(int32_t depthIndex, int32_t colIndex, int32_t rowIndex){
+    if ((depthIndex < 0) || (colIndex > fDepthSize - 1))
+       throw std::out_of_range(GetMessage("depthIndex",depthIndex).c_str());
+ 
+     if ((colIndex < 0) || (colIndex > fColCount - 1))
+       throw std::out_of_range(GetMessage("colIndex",colIndex).c_str());
+ 
+     if ((rowIndex < 0) || (rowIndex > fRowCount - 1))
+       throw std::out_of_range(GetMessage("rowIndex",rowIndex).c_str());
+   }
+
+   int32_t Offset(int32_t depthIndex, int32_t colIndex, int32_t rowIndex){
+     RangeCheck(depthIndex,colIndex,rowIndex); 	  
      return ( (depthIndex * fColCount + colIndex) * fRowCount + rowIndex) * sizeof(Type);
    } 
 
@@ -30,8 +57,8 @@ private:
      return fBaseAdress + Offset(depthIndex, colIndex, rowIndex);
    }
 
-   size_t CalculateMemorySize(int32_t depthSize,int32_t colCount,int32_t rowCount){
-     return sizeof(Type) * depthSize * (colCount * rowCount);
+   void CalculateMemorySize(){
+     fMemorySize = sizeof(Type) * fDepthSize * (fColCount * fRowCount);
    }
    
    void SetDepthAndColAndRowCount(int32_t depthSize,int32_t colCount,int32_t rowCount){
@@ -41,7 +68,8 @@ private:
    }
 
    void MemoryAllocate(){
-     fBaseAdress = (Type*)malloc(CalculateMemorySize(fDepthSize,fColCount,fRowCount));
+     CalculateMemorySize();
+     fBaseAdress = (Type*)malloc(fMemorySize);
    }
 
    void MemoryFree(){
@@ -59,19 +87,20 @@ public:
   }      
 public:
   Type GetElement(int32_t depthIndex,int32_t colIndex, int32_t rowIndex){
-      Type* elementAdress = CalculateElementAdress(colIndex,rowIndex);
+      Type* elementAdress = CalculateElementAdress(depthIndex,colIndex,rowIndex);
       return *elementAdress;
   }
   
   void SetElement(int32_t depthIndex,int32_t colIndex, int32_t rowIndex, Type value){
-      Type* elementAdress = CalculateElementAdress(colIndex,rowIndex);
+      Type* elementAdress = CalculateElementAdress(depthIndex,colIndex,rowIndex);
       *elementAdress = value;
   }
 
   void ReSize(int32_t depthSize, int32_t colCount,int32_t rowCount){
      MemoryFree();
      SetDepthAndColAndRowCount(depthSize,colCount,rowCount);
-     fBaseAdress = (Type*)realloc(fBaseAdress,CalculateMemorySize(depthSize,colCount,rowCount));
+     CalculateMemorySize();
+     fBaseAdress = (Type*)realloc(fBaseAdress,fMemorySize);
   }
 
   int32_t GetColCount(){
@@ -84,6 +113,10 @@ public:
 
   int32_t GetDepthSize(){
     return fDepthSize;
+  }
+
+  int32_t GetMemorySize(){
+    return fMemorySize;
   }
 };
 

@@ -14,8 +14,8 @@
 
 
 using System;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 unsafe class ThreeDimensionalArray<T> where T : unmanaged
 {
@@ -33,17 +33,26 @@ unsafe class ThreeDimensionalArray<T> where T : unmanaged
         MemoryAllocate();
     }
 
-    private int Offset(int depthIndex, int colIndex, int rowIndex)
+    private string GetMessage(string indexName, int index)
+    {
+        return string.Format(IndexOutOfRangeException, indexName, index);
+    }
+
+    private void RangeCheck(int depthIndex, int colIndex, int rowIndex)
     {
         if ((depthIndex < 0) || (colIndex > depthSize - 1))
-            throw new Exception(string.Format(IndexOutOfRangeException, "depthIndex", depthIndex));
+            throw new Exception(GetMessage("depthIndex", depthIndex));
 
         if ((colIndex < 0) || (colIndex > colCount - 1))
-            throw new Exception(string.Format(IndexOutOfRangeException, "colIndex", colIndex));
+            throw new Exception(GetMessage("colIndex", colIndex));
 
         if ((rowIndex < 0) || (rowIndex > rowCount - 1))
-            throw new Exception(string.Format(IndexOutOfRangeException, "rowIndex", rowIndex));
+            throw new Exception(GetMessage("rowIndex", rowIndex));
+    }
 
+    private int Offset(int depthIndex, int colIndex, int rowIndex)
+    {
+        RangeCheck(depthIndex, colIndex, rowIndex);
         return ((depthIndex * colCount + colIndex) * rowCount + rowIndex) * Marshal.SizeOf(typeof(T));
     }
 
@@ -53,9 +62,9 @@ unsafe class ThreeDimensionalArray<T> where T : unmanaged
         return elementAdress;
     }
 
-    private int CalculateMemorySize(int depthSize, int colCount, int rowCount)
+    private void CalculateMemorySize()
     {
-        return Marshal.SizeOf(typeof(T)) * depthSize * (colCount * rowCount);
+        memorySize = Marshal.SizeOf(typeof(T)) * this.depthSize * (this.colCount * this.rowCount);
     }
 
     private void SetDepthAndColAndRowCount(int depthSize, int colCount, int rowCount)
@@ -67,7 +76,7 @@ unsafe class ThreeDimensionalArray<T> where T : unmanaged
 
     private void MemoryAllocate()
     {
-        memorySize = CalculateMemorySize(depthSize, colCount, rowCount);
+        CalculateMemorySize();
         baseAdress = Marshal.AllocHGlobal(memorySize);
     }
 
@@ -82,7 +91,7 @@ unsafe class ThreeDimensionalArray<T> where T : unmanaged
          */
         MemoryFree();
         SetDepthAndColAndRowCount(depthSize, colCount, rowCount);
-        memorySize = CalculateMemorySize(depthSize, colCount, rowCount);
+        CalculateMemorySize();
         baseAdress = Marshal.ReAllocHGlobal(baseAdress, (IntPtr)memorySize);
     }
 
@@ -96,19 +105,22 @@ unsafe class ThreeDimensionalArray<T> where T : unmanaged
     public int RowCount { get { return rowCount; } }
     public int MemorySize { get { return memorySize; } }
 
+    private T* GetElementAdress(int depthIndex, int colIndex, int rowIndex)
+    {
+        void* unTypedElementAdress = CalculateElementAdress(depthIndex, colIndex, rowIndex).ToPointer();
+        T* typedElementAdress = (T*)unTypedElementAdress;
+        return typedElementAdress;
+    }
+
     public T this[int depthIndex, int colIndex, int rowIndex]
     {
         get
         {
-            void* elementAdress = CalculateElementAdress(depthIndex, colIndex, rowIndex).ToPointer();
-            T* tp = (T*)elementAdress;
-            return *tp;
+            return *GetElementAdress(depthIndex, colIndex, rowIndex);
         }
         set
         {
-            void* elementAdress = CalculateElementAdress(depthIndex, colIndex, rowIndex).ToPointer();
-            T* tp = (T*)elementAdress;
-            *tp = value;
+            *GetElementAdress(depthIndex, colIndex, rowIndex) = value;
         }
     }
 

@@ -19,11 +19,10 @@ uses
   System.Classes,
   System.SysUtils;
 
-const IndexOutOfRangeException = 'IndexOutOfRangeException at %s %d';
-
 type
 
   TThreeDimensionalArray<T> = class
+   const IndexOutOfRangeException = 'IndexOutOfRangeException at %s %d';
   type
     PT = ^T;
   strict private
@@ -34,11 +33,13 @@ type
     FBaseAdress: PT;
     FPtrWrapper : TPtrWrapper;
   strict private
+    function GetMessage(AIndexName:string;AIndex:NativeInt):string;
+    procedure RangeCheck(ADepthIndex,AColIndex, ARowIndex: NativeInt);
     function Offset(ADepthIndex,AColIndex, ARowIndex: NativeInt): NativeInt;
     function GetElement(ADepthIndex,AColIndex, ARowIndex: NativeInt): T;
     procedure SetElement(ADepthIndex,AColIndex, ARowIndex: NativeInt; const Value: T);
     function CalculateElementAdress(ADepthIndex,AColIndex, ARowIndex: NativeInt): PT;
-    function CalculateMemorySize(ADepthSize,AColCount, ARowCount: NativeInt):NativeInt;
+    procedure CalculateMemorySize();
     procedure SetDepthAndColAndRowCount(ADepthSize,AColCount, ARowCount: NativeInt);
     procedure MemoryAllocate();
     procedure MemoryFree();
@@ -71,18 +72,29 @@ begin
   inherited Destroy;
 end;
 
+function TThreeDimensionalArray<T>.GetMessage(AIndexName: string;
+  AIndex: NativeInt): string;
+begin
+   Result := Format(IndexOutOfRangeException,[AIndexName,AIndex]);
+end;
+
+procedure TThreeDimensionalArray<T>.RangeCheck(ADepthIndex, AColIndex,
+  ARowIndex: NativeInt);
+begin
+  if (ADepthIndex < 0) or (ADepthIndex > Pred(FDepthSize) ) then
+     raise Exception.Create(GetMessage('ADepthIndex',ADepthIndex));
+
+  if (AColIndex < 0) or (AColIndex > Pred(FColCount) ) then
+     raise Exception.Create(GetMessage('AColIndex',AColIndex));
+
+  if (ARowIndex < 0) or (ARowIndex > Pred(FRowCount) ) then
+     raise Exception.Create(GetMessage('ARowIndex',ARowIndex));
+end;
+
 function TThreeDimensionalArray<T>.Offset(ADepthIndex,AColIndex, ARowIndex: NativeInt)
   : NativeInt;
 begin
-  if (ADepthIndex < 0) or (ADepthIndex > Pred(FDepthSize) ) then
-     raise Exception.Create(Format(IndexOutOfRangeException,['ADepthIndex',ADepthIndex]));
-
-  if (AColIndex < 0) or (AColIndex > Pred(FColCount) ) then
-     raise Exception.Create(Format(IndexOutOfRangeException,['AColIndex',AColIndex]));
-
-  if (ARowIndex < 0) or (ARowIndex > Pred(FRowCount) ) then
-     raise Exception.Create(Format(IndexOutOfRangeException,['ARowIndex',ARowIndex]));
-
+  RangeCheck(ADepthIndex,AColIndex, ARowIndex);
   Result := ( (ADepthIndex * FColCount + AColIndex) * FRowCount + ARowIndex) * SizeOf(T);
 end;
 
@@ -90,7 +102,7 @@ procedure TThreeDimensionalArray<T>.ReSize(ADepthSize,AColCount, ARowCount: Nati
 begin
   MemoryFree();
   SetDepthAndColAndRowCount(ADepthSize,AColCount,ARowCount);
-  FMemorySize := CalculateMemorySize(ADepthSize,AColCount, ARowCount);
+  CalculateMemorySize();
   FPtrWrapper := TMarshal.ReallocMem(FPtrWrapper,FMemorySize);
   FBaseAdress := FPtrWrapper.ToPointer;
 end;
@@ -104,7 +116,7 @@ end;
 
 procedure TThreeDimensionalArray<T>.MemoryAllocate();
 begin
-  FMemorySize := CalculateMemorySize(FDepthSize,FColCount, FRowCount);
+  CalculateMemorySize();
   FPtrWrapper := TMarshal.AllocMem(FMemorySize);
   FBaseAdress := FPtrWrapper.ToPointer;
 end;
@@ -120,10 +132,9 @@ begin
   Result := PT(PByte(FBaseAdress) + Offset(ADepthIndex,AColIndex, ARowIndex));
 end;
 
-function TThreeDimensionalArray<T>.CalculateMemorySize(ADepthSize,AColCount,
- ARowCount: NativeInt): NativeInt;
+procedure TThreeDimensionalArray<T>.CalculateMemorySize();
 begin
-  Result := SizeOf(T) * ADepthSize * (AColCount * ARowCount);
+  FMemorySize := SizeOf(T) * FDepthSize * (FColCount * FRowCount);
 end;
 
 function TThreeDimensionalArray<T>.GetElement(ADepthIndex,AColIndex, ARowIndex: NativeInt): T;

@@ -15,6 +15,12 @@
 #include <sstream>
 #include <iostream>
 
+typedef struct Index{
+  int32_t depthIndex;
+  int32_t colIndex; 
+  int32_t rowIndex;
+} Index, *PIndex;
+
 template <class Type>
 class ThreeDimensionalArray{
 private:
@@ -96,6 +102,11 @@ public:
       *elementAdress = value;
   }
 
+  Type & operator[](PIndex index){ 
+     Type* elementAdress = CalculateElementAdress(index->depthIndex, index->colIndex, index->rowIndex);
+     return *elementAdress;
+  }
+  
   void ReSize(int32_t depthSize, int32_t colCount,int32_t rowCount){
      MemoryFree();
      SetDepthAndColAndRowCount(depthSize,colCount,rowCount);
@@ -135,6 +146,11 @@ int main(){
              for (size_t rowIndex = 0; rowIndex < anArray.GetRowCount(); rowIndex++)
                    std::cout <<  anArray.GetElement(depthIndex,colIndex,rowIndex) << std::endl;
   
+    // access elements via indexer
+    Index index = { 0, 0, 0 };
+    int32_t val = anArray[&index];
+    anArray[&index] = 31;
+
     system("pause");
     return EXIT_SUCCESS;
 }

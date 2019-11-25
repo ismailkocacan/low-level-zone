@@ -15,6 +15,11 @@
 #include <sstream>
 #include <iostream>
 
+typedef struct Index{
+  int32_t colIndex;
+  int32_t rowIndex;
+} Index, *PIndex;
+
 template <class Type>
 class DimensionalArray{
 private:
@@ -90,6 +95,11 @@ public:
       *elementAdress = value;
   }
 
+  Type & operator[](PIndex index){ 
+     Type* elementAdress = CalculateElementAdress(index->colIndex, index->rowIndex);
+     return *elementAdress;
+  }
+
   void ReSize(int32_t colCount,int32_t rowCount){
      MemoryFree();
      SetColAndRowCount(colCount,rowCount);
@@ -127,6 +137,10 @@ int main(){
         int32_t value_1_1 = myTwoDimensionArray.GetElement(1,1);  
         std::cout << "2. kolon, 2. satır Değeri: " << value_1_1 << std::endl;
       */
+
+        Index index = { 0, 0 };
+        int32_t val = myTwoDimensionArray[&index];
+        myTwoDimensionArray[&index] = 31;
 
         // test
         for (size_t colIndex = 0; colIndex < myTwoDimensionArray.GetColCount(); colIndex++){

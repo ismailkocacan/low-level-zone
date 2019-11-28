@@ -1,20 +1,26 @@
-// ConsoleApplication.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
-#include <iostream>
+﻿#include "threedimensionalarray.hpp"
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	ThreeDimensionalArray<int32_t> anArray(2, 2, 2); // 2 adet, 2 sütun, 2 satırlık tablo
+
+   // access elements ( set)
+	for (size_t depthIndex = 0; depthIndex < anArray.GetDepthSize(); depthIndex++)
+		for (size_t colIndex = 0; colIndex < anArray.GetColCount(); colIndex++)
+			for (size_t rowIndex = 0; rowIndex < anArray.GetRowCount(); rowIndex++)
+				anArray.SetElement(depthIndex, colIndex, rowIndex, depthIndex + colIndex + rowIndex);
+
+	// access elements ( get)
+	for (size_t depthIndex = 0; depthIndex < anArray.GetDepthSize(); depthIndex++)
+		for (size_t colIndex = 0; colIndex < anArray.GetColCount(); colIndex++)
+			for (size_t rowIndex = 0; rowIndex < anArray.GetRowCount(); rowIndex++)
+				std::cout << anArray.GetElement(depthIndex, colIndex, rowIndex) << std::endl;
+
+	// access elements via indexer
+	Index index = { 0, 0, 0 };
+	int32_t val = anArray[&index];
+	anArray[&index] = 31;
+
+	system("pause");
+	return EXIT_SUCCESS;
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

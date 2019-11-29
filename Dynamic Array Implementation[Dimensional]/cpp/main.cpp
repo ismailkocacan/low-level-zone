@@ -24,6 +24,7 @@ template <class Type>
 class DimensionalArray{
 private:
    const std::string IndexOutOfRangeException = "IndexOutOfRangeException at "; 
+   const std::string MemoryAllocationError = "Memory allocation error !"; 
    Type* fBaseAdress;  
    int32_t fColCount;
    int32_t fRowCount;
@@ -37,6 +38,11 @@ private:
 
    std::string GetMessage(std::string indexName,int32_t index){
       return std::string(IndexOutOfRangeException + indexName + "["+ ToString(index)+"]");
+   }
+
+   void MemoryAllocationCheck(){
+      if (!fBaseAdress) 
+        std::runtime_error(MemoryAllocationError.c_str());
    }
 
    void RangeCheck(int32_t colIndex, int32_t rowIndex){
@@ -68,6 +74,7 @@ private:
    void MemoryAllocate(){
      CalculateMemorySize();
      fBaseAdress = (Type*)malloc(fMemorySize);
+     MemoryAllocationCheck();
    }
 
    void MemoryFree(){
@@ -99,10 +106,10 @@ public:
   }
 
   void ReSize(int32_t colCount,int32_t rowCount){
-     MemoryFree();
      SetColAndRowCount(colCount,rowCount);
      fMemorySize = CalculateMemorySize();
      fBaseAdress = (Type*)realloc(fBaseAdress,fMemorySize);
+     MemoryAllocationCheck();
   }
 
   int32_t GetColCount() const{

@@ -126,11 +126,11 @@ public:
     return fRowCount;
   }
 
-  int32_t GetDepthSize(){
+  int32_t GetDepthSize() const{
     return fDepthSize;
   }
 
-  int32_t GetMemorySize(){
+  int32_t GetMemorySize() const{
     return fMemorySize;
   }
 };

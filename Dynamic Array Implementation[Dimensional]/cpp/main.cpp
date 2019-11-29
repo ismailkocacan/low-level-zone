@@ -107,11 +107,11 @@ public:
      fBaseAdress = (Type*)realloc(fBaseAdress,fMemorySize);
   }
 
-  int32_t GetColCount(){
+  int32_t GetColCount() const{
     return fColCount;
   }
 
-  int32_t GetRowCount(){
+  int32_t GetRowCount() const{
     return fRowCount;
   }
 };

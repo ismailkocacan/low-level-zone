@@ -37,11 +37,9 @@ private:
    int32_t fMemorySize;
 private:
    std::string ToString(int32_t value){
-      std::string outString;
-      std::stringstream ss;
+      std::ostringstream ss;
       ss << value;
-      outString = ss.str();
-      return outString;
+      return ss.str();
    }
 
    std::string GetMessage(std::string indexName,int32_t index){

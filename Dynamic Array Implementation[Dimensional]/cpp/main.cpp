@@ -125,7 +125,7 @@ public:
 template<class Type> 
 class FastDimensionalArray: public DimensionalArray<Type>{
    int32_t Offset(int32_t colIndex, int32_t rowIndex) override{
-      int x = this->fColCount;
+      // to do
       return 0;
    } 
 };

@@ -29,7 +29,7 @@ private:
    int32_t fColCount;
    int32_t fRowCount;
    int32_t fMemorySize; 
-private:
+protected:
    std::string ToString(int32_t value){
       std::ostringstream ss;
       ss << value;
@@ -53,7 +53,7 @@ private:
        throw std::out_of_range(GetMessage("rowIndex",rowIndex).c_str());
    }
 
-   int32_t Offset(int32_t colIndex, int32_t rowIndex){
+   virtual int32_t Offset(int32_t colIndex, int32_t rowIndex){
      RangeCheck(colIndex,rowIndex);
  	   return (colIndex * fRowCount + rowIndex) * sizeof(Type);
    } 
@@ -121,6 +121,14 @@ public:
   }
 };
 
+
+template<class Type> 
+class FastDimensionalArray: public DimensionalArray<Type>{
+   int32_t Offset(int32_t colIndex, int32_t rowIndex) override{
+      int x = this->fColCount;
+      return 0;
+   } 
+};
 
 int main(){    
     try{

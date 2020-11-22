@@ -11,8 +11,12 @@ type
   TForm1 = class(TForm)
     Button1: TButton;
     Button2: TButton;
+    Button3: TButton;
+    Button4: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -42,6 +46,14 @@ begin
    OutputDebugString('Event set edilemedi');
   Result := 0;
 end;
+
+
+function ThreadStartRoutine2(lpThreadParameter: Pointer): Integer stdcall;
+begin
+  OutputDebugString('ThreadStartRoutine2 is calisiyor.');
+  Result := 0;
+end;
+
 
 procedure TForm1.Button1Click(Sender: TObject);
 begin
@@ -86,6 +98,48 @@ begin
   end;
 
   CloseHandle(EventHandle);
+end;
+
+procedure TForm1.Button3Click(Sender: TObject);
+var
+ NamedEventHandle : THandle;
+begin
+  NamedEventHandle := CreateEvent(nil,
+                                  false,
+                                  false,
+                                  PChar('KellePaca'));
+  if NamedEventHandle = 0 then
+    RaiseLastOSError;
+
+  ThreadHandle := CreateThread(nil, 0, @ThreadStartRoutine2, nil, 0, ThreadId);
+  if ThreadHandle <> 0 then
+  begin
+    EventResult := WaitForSingleObject(NamedEventHandle, INFINITE);
+
+    CloseHandle(ThreadHandle);
+
+    if EventResult = WAIT_OBJECT_0  then
+     ShowMessage('Event Signal Oldu.');
+
+    if EventResult = WAIT_TIMEOUT  then
+     ShowMessage('Wait TimeOut Oldu.');
+  end;
+
+  CloseHandle(NamedEventHandle);
+end;
+
+procedure TForm1.Button4Click(Sender: TObject);
+var
+  NamedEventHandle : THandle;
+begin
+  NamedEventHandle := OpenEvent(EVENT_ALL_ACCESS ,true,'KellePaca');
+  if NamedEventHandle = 0 then
+    RaiseLastOSError;
+
+  if not SetEvent(NamedEventHandle) then
+    RaiseLastOSError;
+
+  ShowMessage('Event Resetted');
 end;
 
 end.

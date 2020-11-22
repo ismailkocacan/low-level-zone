@@ -1,8 +1,8 @@
 object Form1: TForm1
   Left = 0
   Top = 0
-  Caption = 'Form1'
-  ClientHeight = 265
+  Caption = 'Events'
+  ClientHeight = 423
   ClientWidth = 449
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -30,5 +30,23 @@ object Form1: TForm1
     Caption = 'Test WAIT_TIMEOUT'
     TabOrder = 1
     OnClick = Button2Click
+  end
+  object Button3: TButton
+    Left = 32
+    Top = 216
+    Width = 169
+    Height = 137
+    Caption = 'Create Named Event'
+    TabOrder = 2
+    OnClick = Button3Click
+  end
+  object Button4: TButton
+    Left = 224
+    Top = 216
+    Width = 161
+    Height = 137
+    Caption = 'Reset Event'
+    TabOrder = 3
+    OnClick = Button4Click
   end
 end

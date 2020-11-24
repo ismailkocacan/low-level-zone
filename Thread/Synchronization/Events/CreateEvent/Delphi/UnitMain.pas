@@ -2,7 +2,7 @@
     https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-createeventa
 
    - bManuelReset parametresi true ise, manuel reset edilen olan bir event nesnesi oluþturulur.
-     Manuel reset edilen bu event nesnesi manuel reset edebilmek için, ResetEvent çaðýrýlýr.
+     nonsignaled duruma getirmek için, ResetEvent çaðýrýlýr.
 
    - bManuelReset false ise, auto-reset event nesnesi oluþturulur.
      Thread release(serbest býrakýldýðýnda) edildiðinde, sistem tarafýndan
@@ -29,10 +29,14 @@ type
     Button2: TButton;
     Button3: TButton;
     Button4: TButton;
+    Button5: TButton;
+    Button6: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
+    procedure Button5Click(Sender: TObject);
+    procedure Button6Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -52,7 +56,6 @@ implementation
 
 {$R *.dfm}
 
-
 // TThreadStartRoutine = function(lpThreadParameter: Pointer): Integer stdcall;
 function ThreadStartRoutine(lpThreadParameter: Pointer): Integer stdcall;
 begin
@@ -69,6 +72,28 @@ begin
   OutputDebugString('ThreadStartRoutine2 is calisiyor.');
   Result := 0;
 end;
+
+
+
+function ThreadStartRoutine3(lpThreadParameter: Pointer): Integer stdcall;
+var
+ AnEventHandle : THandle;
+ AnEventResult : Cardinal;
+begin
+  AnEventHandle := PHandle(lpThreadParameter)^;
+  while True do
+  begin
+    AnEventResult := WaitForSingleObject(AnEventHandle,INFINITE);
+    if AnEventResult = WAIT_OBJECT_0 then
+    begin
+      OutputDebugString('>>>>>>>>>>>>>>>>>>>>>>> Otobus geldi');
+      ResetEvent(AnEventHandle); // nonsignaled
+    end;
+  end;
+  OutputDebugString('>>>>>>>>>>>>>>>>>>>>>>> Bitti');
+  Result := 0;
+end;
+
 
 
 procedure TForm1.Button1Click(Sender: TObject);
@@ -159,6 +184,40 @@ begin
     RaiseLastOSError;
 
   ShowMessage('Event Resetted');
+end;
+
+procedure TForm1.Button5Click(Sender: TObject);
+var
+  AnEventHandle : THandle;
+begin
+  AnEventHandle := CreateEvent(nil,
+                              true,  { manuel reset event object}
+                              false, { nonsignaled}
+                              'MyEvent');
+
+  if AnEventHandle = 0 then
+    RaiseLastOSError;
+
+  ThreadHandle := CreateThread(nil,
+                               0,
+                               @ThreadStartRoutine3,
+                               @AnEventHandle,
+                               0,
+                               ThreadId);
+end;
+
+procedure TForm1.Button6Click(Sender: TObject);
+var
+  AnEventHandle : THandle;
+begin
+  AnEventHandle := OpenEvent(EVENT_ALL_ACCESS,
+                            true,
+                            'MyEvent');
+  if AnEventHandle = 0 then
+    RaiseLastOSError;
+
+  if not SetEvent(AnEventHandle) then
+    RaiseLastOSError;
 end;
 
 end.

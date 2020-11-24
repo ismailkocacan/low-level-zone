@@ -1,3 +1,19 @@
+{
+    https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-createeventa
+
+   - bManuelReset parametresi true ise, manuel reset edilen olan bir event nesnesi oluþturulur.
+     Manuel reset edilen bu event nesnesi manuel reset edebilmek için, ResetEvent çaðýrýlýr.
+
+   - bManuelReset false ise, auto-reset event nesnesi oluþturulur.
+     Thread release(serbest býrakýldýðýnda) edildiðinde, sistem tarafýndan
+     otomatik olarak event state nonsignaled duruma gelir.
+
+
+   - bInitialState parametresi true ise; event nesnesi signaled, false ise nonsignaled durumdadýr.
+   - ResetEvent event nesnesini, nonsignaled olarak set eder.
+   - SetEvent event nesnesini, signaled olarak set eder.
+}
+
 unit UnitMain;
 
 interface
@@ -57,7 +73,10 @@ end;
 
 procedure TForm1.Button1Click(Sender: TObject);
 begin
-  EventHandle := CreateEvent(nil, false, false, '');
+  EventHandle := CreateEvent(nil,
+                             false,
+                             false, { nonsignaled }
+                             '');
   if EventHandle = 0 then
     RaiseLastOSError;
 

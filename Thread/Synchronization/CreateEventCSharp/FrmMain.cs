@@ -18,7 +18,7 @@ namespace CreateEvents
             InitializeComponent();
         }
 
-        void ParameterizedThreadStartFunction(object obj)
+        void ParameterizedThreadStartProc(object obj)
         {
             EventWaitHandle eventWaitHandle = (EventWaitHandle)obj;
             while (true)
@@ -34,7 +34,7 @@ namespace CreateEvents
         private void btnCreateEvent_Click(object sender, EventArgs e)
         {
             EventWaitHandle eventHandle = new EventWaitHandle(false, EventResetMode.ManualReset, "MyEvent");
-            ParameterizedThreadStart functionPointer = ParameterizedThreadStartFunction;
+            ParameterizedThreadStart functionPointer = ParameterizedThreadStartProc;
             Thread thread = new Thread(functionPointer, 0);
             thread.Start(eventHandle);
         }

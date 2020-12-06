@@ -75,7 +75,7 @@ begin
            end
           );
 
-          CloseHandle(WaitResult);
+          CloseHandle(TimerHandle);
 
        end
       ).Start;

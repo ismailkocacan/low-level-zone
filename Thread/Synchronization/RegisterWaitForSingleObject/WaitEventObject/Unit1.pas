@@ -13,9 +13,13 @@ type
     btnUnRegisterWait: TButton;
     Memo1: TMemo;
     cBoxFlags: TComboBox;
+    btnSet: TButton;
+    btnReset: TButton;
     procedure btnRegisterClick(Sender: TObject);
     procedure btnUnRegisterWaitClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure btnSetClick(Sender: TObject);
+    procedure btnResetClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -65,8 +69,15 @@ end;
  When the specified conditions are met, the callback function is executed by a worker thread from the thread pool.
 }
 
-// TWaitOrTimerCallback = procedure (Context: Pointer; Success: Boolean) stdcall;
-procedure WaitOrTimerCallback(Context: Pointer; Success: Boolean) stdcall;
+{
+ VOID CALLBACK WaitOrTimerCallback(
+  _In_ PVOID   lpParameter,
+  _In_ BOOLEAN TimerOrWaitFired
+);
+
+ TWaitOrTimerCallback = procedure (Context: Pointer; Success: Boolean) stdcall;
+}
+procedure WaitOrTimerCallback(Context: Pointer; TimerOrWaitFired: Boolean) stdcall;
 var
  AEventHandle: THandle;
 begin
@@ -77,19 +88,17 @@ begin
     AEventHandle := PHandle(Context)^;
     //ResetEvent(AEventHandle); // nosignaled
   end;
+
+  if TimerOrWaitFired then
+     L('>>>>>>>>>>>>>>>>>>>>>>> The wait timed out')
+   else
+     L('>>>>>>>>>>>>>>>>>>>>>>> The wait event has been signaled');
 end;
 
 procedure TForm1.btnRegisterClick(Sender: TObject);
 var
  dwFlags: DWORD;
 begin
-  hEventObject := CreateEvent(nil,
-                             false,
-                             false,
-                             nil);
-  if hEventObject = 0 then
-    RaiseLastOSError;
-
   dwFlags := cDwFlags[cBoxFlags.ItemIndex].Flag;
   bResult := RegisterWaitForSingleObject(hWaitObject,
                                          hEventObject,
@@ -97,6 +106,16 @@ begin
                                          @hEventObject,
                                          2000,
                                          dwFlags);
+end;
+
+procedure TForm1.btnResetClick(Sender: TObject);
+begin
+  ResetEvent(hEventObject);
+end;
+
+procedure TForm1.btnSetClick(Sender: TObject);
+begin
+  SetEvent(hEventObject);
 end;
 
 procedure TForm1.btnUnRegisterWaitClick(Sender: TObject);
@@ -114,6 +133,14 @@ procedure TForm1.FormCreate(Sender: TObject);
 var
  Flag: TFlag;
 begin
+  hEventObject := CreateEvent(nil,
+                             false,
+                             false,
+                             nil);
+  if hEventObject = 0 then
+    RaiseLastOSError;
+
+
   for Flag in cDwFlags do
    cBoxFlags.Items.Add(Flag.Name);
   cBoxFlags.ItemIndex := 0;

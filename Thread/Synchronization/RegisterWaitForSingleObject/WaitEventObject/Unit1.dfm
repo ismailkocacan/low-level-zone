@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'ThreadPool'
-  ClientHeight = 314
+  ClientHeight = 398
   ClientWidth = 416
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -35,7 +35,7 @@ object Form1: TForm1
   end
   object Memo1: TMemo
     Left = 0
-    Top = 130
+    Top = 214
     Width = 416
     Height = 184
     Align = alBottom
@@ -49,5 +49,23 @@ object Form1: TForm1
     Height = 21
     Style = csDropDownList
     TabOrder = 3
+  end
+  object btnSet: TButton
+    Left = 24
+    Top = 119
+    Width = 177
+    Height = 74
+    Caption = 'Set'
+    TabOrder = 4
+    OnClick = btnSetClick
+  end
+  object btnReset: TButton
+    Left = 207
+    Top = 119
+    Width = 177
+    Height = 74
+    Caption = 'Reset'
+    TabOrder = 5
+    OnClick = btnResetClick
   end
 end

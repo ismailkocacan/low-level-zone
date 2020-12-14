@@ -12,15 +12,20 @@ uses
   Vcl.Controls,
   Vcl.Forms,
   Vcl.Dialogs,
-  Vcl.StdCtrls;
+  Vcl.StdCtrls, Vcl.ExtCtrls;
 
 type
   TForm1 = class(TForm)
     btnSetEvent: TButton;
     btnCreateThreads: TButton;
     mLog: TMemo;
+    Timer1: TTimer;
+    Label1: TLabel;
+    Label2: TLabel;
     procedure btnSetEventClick(Sender: TObject);
     procedure btnCreateThreadsClick(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
@@ -40,12 +45,19 @@ type
 
 const
   cEventName = 'KernelFlag';
-  cThreadCount = 64;
+  cThreadCount = 100;
 
 var
   Form1: TForm1;
-  ThreadHandles: array[0..cThreadCount - 1] of THandle;
 
+  EventObjectHandle: THandle;
+    
+  ActiveThreadCount : Integer = 0;
+  CallbackFuncCallCount : Integer = 0;
+  ThreadHandles: array[0..cThreadCount - 1] of THandle;
+  WaitHandles: array[0..cThreadCount - 1] of THandle;
+
+  
 implementation
 
 {$R *.dfm}
@@ -56,26 +68,74 @@ begin
 end;
 
 
+procedure WaitOrTimerCallback(Context: Pointer; Success: Boolean) stdcall;
+begin
+
+  if TThread.CurrentThread.ThreadID <> MainThreadID then
+  begin
+     OutputDebugString('>>>>>>>>>>>>>>>>>>>>>>> Threadin Kendisi >>>>');
+  end else
+  begin
+     OutputDebugString('>>>>>>>>>>>>>>>>>>>>>>> Main Thread >>>>');
+  end;
+
+  InterlockedAdd(CallbackFuncCallCount, 1);
+
+  {
+    The function compares the Destination value with the Comparand value.
+    If the Destination value is equal to the Comparand value,
+    the Exchange value is stored in the address specified by Destination. 
+    Otherwise, no operation is performed.
+  }
+  if InterlockedCompareExchange(CallbackFuncCallCount,
+                                CallbackFuncCallCount,
+                                cThreadCount) = cThreadCount then
+  begin
+    InterlockedExchange(CallbackFuncCallCount, 0);
+    L('Tüm threadlerin iþi bitti');
+  end;
+
+  OutputDebugString('>>>>>>>>>>>>>>>>>>>>>>> WaitOrTimerCallback >>>>');
+end;
+
 procedure TForm1.btnSetEventClick(Sender: TObject);
 var
-  EventObjectHandle: THandle;
+  LEventObjectHandle: THandle;
 begin
-  EventObjectHandle := OpenEvent(EVENT_ALL_ACCESS,true,cEventName);
+  LEventObjectHandle := OpenEvent(EVENT_ALL_ACCESS,true,cEventName);
 
-  if EventObjectHandle = 0 then
+  if LEventObjectHandle = 0 then
     RaiseLastOSError;
 
-  if not SetEvent(EventObjectHandle) then
+  if not SetEvent(LEventObjectHandle) then
     RaiseLastOSError;
 end;
 
 
+procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
+var
+ WaitHandle:  THandle;
+begin
+
+  if EventObjectHandle <> 0  then
+    CloseHandle(EventObjectHandle);
+    
+  for WaitHandle in WaitHandles do
+    if WaitHandle <> 0 then
+      UnregisterWait(WaitHandle);
+end;
+
+procedure TForm1.Timer1Timer(Sender: TObject);
+begin
+   Label1.Caption := 'Active Thread Count:' + ActiveThreadCount.ToString();
+   Label2.Caption := 'Callback call Count:' + CallbackFuncCallCount.ToString();
+end;
+
 procedure TForm1.btnCreateThreadsClick(Sender: TObject);
 var
-  I: Integer;
-  EventObjectHandle: THandle;
-  WaitResult : Cardinal;
+  I: Integer;  
   TestThread : TTestThread;
+  hWaitObject : THandle;
 begin
   EventObjectHandle := CreateEvent(nil, true, false, cEventName);
   if EventObjectHandle = 0 then
@@ -87,10 +147,20 @@ begin
   begin
     TestThread := TTestThread.Create(IntToStr(I)+ '. Thread', EventObjectHandle);
     ThreadHandles[I] := TestThread.Handle;
+
+    if RegisterWaitForSingleObject(hWaitObject,
+                                   TestThread.Handle,
+                                   @WaitOrTimerCallback,
+                                   @TestThread.Handle,
+                                   INFINITE,
+                                   WT_EXECUTEONLYONCE) then 
+      WaitHandles[I] := hWaitObject;
+    
     TestThread.Start;
   end;
+   L('Threadlerin create edilmesi tamamlandý');
 
- 
+  {
   TThread.CreateAnonymousThread(
    procedure
    begin
@@ -107,7 +177,7 @@ begin
         );
    end
   ).Start;
-
+  }
 
 end;
 
@@ -125,10 +195,20 @@ var
  WaitResult : Cardinal;
 begin
   inherited;
+
   OutputDebugString(PChar(FName + ' Beklemede.'));
+
+  InterlockedAdd(ActiveThreadCount, 1);
+
   WaitResult := WaitForSingleObject(FEventHandle,INFINITE);
+
   if WaitResult = WAIT_OBJECT_0 then
+  begin
+    InterlockedDecrement(ActiveThreadCount);
+
     OutputDebugString(PChar(FName + ' Signaled...'));
+  end;
+
 end;
 
 end.

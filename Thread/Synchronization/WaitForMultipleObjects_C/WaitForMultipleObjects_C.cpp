@@ -12,11 +12,14 @@ HANDLE ThreadHandles[cThreadCount - 1];
 HANDLE WaitObjects[cThreadCount - 1];
 
 
+HANDLE hEventObject = 0;
+
 VOID NTAPI WaitOrTimerCallback(PVOID lpParameter, BOOLEAN TimerOrWaitFired) {
     /*
     InterlockedAdd(&CallbackFuncCallCount, 1);
     if (InterlockedCompareExchange(CallbackFuncCallCount, CallbackFuncCallCount, cThreadCount) == cThreadCount) {
         InterlockedExchange(&CallbackFuncCallCount, 0);
+        CloseHandle(hEventObject);
     }
     */
 }
@@ -38,7 +41,7 @@ DWORD WINAPI ThreadStartFunction(LPVOID lpThreadParameter) {
 
 int main()
 {
-    HANDLE hEventObject = CreateEvent(NULL, true, false, EVENT_NAME);
+    hEventObject = CreateEvent(NULL, true, false, EVENT_NAME);
     if (hEventObject == 0)
         return 0;
     ResetEvent(hEventObject);

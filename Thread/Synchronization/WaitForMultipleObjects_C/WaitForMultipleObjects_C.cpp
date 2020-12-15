@@ -37,7 +37,11 @@ DWORD WINAPI ThreadStartFunction(LPVOID lpThreadParameter) {
     return 0;
 }
 
-
+void Set()
+{
+    HANDLE eventHandle = OpenEvent(EVENT_ALL_ACCESS, true, EVENT_NAME);
+    SetEvent(eventHandle);
+}
 
 int main()
 {

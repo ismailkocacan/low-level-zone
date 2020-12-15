@@ -4,15 +4,33 @@
 #define EVENT_NAME L"KFLAG"
 
 const int cThreadCount = 100;
+
+int ActiveThreadCount = 0;
+int CallbackFuncCallCount = 0;
+
 HANDLE ThreadHandles[cThreadCount - 1];
 HANDLE WaitObjects[cThreadCount - 1];
 
-VOID NTAPI WaitOrTimerCallback(PVOID lpParameter, BOOLEAN TimerOrWaitFired) {
 
+VOID NTAPI WaitOrTimerCallback(PVOID lpParameter, BOOLEAN TimerOrWaitFired) {
+    /*
+    InterlockedAdd(&CallbackFuncCallCount, 1);
+    if (InterlockedCompareExchange(CallbackFuncCallCount, CallbackFuncCallCount, cThreadCount) == cThreadCount) {
+        InterlockedExchange(&CallbackFuncCallCount, 0);
+    }
+    */
 }
 
 
 DWORD WINAPI ThreadStartFunction(LPVOID lpThreadParameter) {
+    /*
+    InterlockedAdd(&ActiveThreadCount, 1);
+    HANDLE eventHandle = (HANDLE)lpThreadParameter;
+    DWORD WaitResult = WaitForSingleObject(eventHandle, INFINITE);
+    if (WaitResult == WAIT_OBJECT_0){
+      InterlockedDecrement(&ActiveThreadCount);
+    }
+    */
     return 0;
 }
 
@@ -37,14 +55,16 @@ int main()
                                             &lpThreadId);
         ThreadHandles[i] = threadHandle;
 
-        HANDLE hWaitObject = 0;
-        if (RegisterWaitForSingleObject(&hWaitObject,
-                                        threadHandle,
-                                        &WaitOrTimerCallback,
-                                        &threadHandle,
-                                        INFINITE,
-                                        WT_EXECUTEONLYONCE))
-            WaitObjects[i] = hWaitObject;
+        if (threadHandle) {
+            HANDLE hWaitObject = 0;
+            if (RegisterWaitForSingleObject(&hWaitObject,
+                threadHandle,
+                &WaitOrTimerCallback,
+                &threadHandle,
+                INFINITE,
+                WT_EXECUTEONLYONCE))
+                WaitObjects[i] = hWaitObject;
+        }
     }
 
     std::cout << "Hello World!\n";
